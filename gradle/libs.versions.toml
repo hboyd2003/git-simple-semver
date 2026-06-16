@@ -1,0 +1,25 @@
+[versions]
+kotlin = "2.3.10"
+pluginPublish = "2.1.0"
+jgit = "7.6.0.+"
+indra = "4.1.0-SNAPSHOT"
+gitSimpleSemver = "1.0.0-SNAPSHOT"
+
+# Testing
+junit = "6.0.3"
+
+[plugins]
+kotlin = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin"}
+pluginPublish = { id = "com.gradle.plugin-publish", version.ref = "pluginPublish"}
+indra = { id = "net.kyori.indra", version.ref = "indra" }
+indraPluginPublishing = { id = "net.kyori.indra.publishing.gradle-plugin", version.ref = "indra" }
+indraLicenserSpotless = { id = "net.kyori.indra.licenser.spotless", version.ref = "indra" }
+gitSimpleSemver = { id = "dev.hboyd.git-simple-semver", version.ref = "gitSimpleSemver" }
+
+[libraries]
+jgit = { module = "org.eclipse.jgit:org.eclipse.jgit", version.ref = "jgit" }
+
+# Testing
+junitBom = { group = "org.junit", name = "junit-bom", version.ref = "junit" }
+junitJupiter = { group = "org.junit.jupiter", name = "junit-jupiter", version.ref = "junit" }
+junitPlatformLauncher = { group = "org.junit.platform", name = "junit-platform-launcher", version.ref = "junit" }
