@@ -31,7 +31,7 @@ open class SemanticVersion(
     var patch: Int,
     val preReleaseLabel: SemanticLabel.PreRelease = SemanticLabel.PreRelease(),
     val buildMetadataLabel: SemanticLabel.BuildMetadata = SemanticLabel.BuildMetadata(),
-) : Comparable<SemanticVersion> {
+) : Comparable<SemanticVersion>, java.io.Serializable {
     companion object {
         /**
          * A regex that matches an entire semantic version string.
