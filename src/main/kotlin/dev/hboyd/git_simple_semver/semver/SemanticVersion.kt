@@ -78,8 +78,8 @@ open class SemanticVersion(
      * Returns a new [SemanticVersion] with its version bumped by the specified [bumpType].
      */
     fun bump(bumpType: BumpType): SemanticVersion = when (bumpType) {
-        BumpType.MAJOR -> SemanticVersion(major + 1, minor, patch, preReleaseLabel, buildMetadataLabel)
-        BumpType.MINOR -> SemanticVersion(major, minor + 1, patch, preReleaseLabel, buildMetadataLabel)
+        BumpType.MAJOR -> SemanticVersion(major + 1, 0, 0, preReleaseLabel, buildMetadataLabel)
+        BumpType.MINOR -> SemanticVersion(major, minor + 1, 0, preReleaseLabel, buildMetadataLabel)
         BumpType.PATCH -> SemanticVersion(major, minor, patch + 1, preReleaseLabel, buildMetadataLabel)
         BumpType.NONE -> this
     }
