@@ -26,6 +26,7 @@ indra {
         publishing(false)
     }
 
+    publishReleasesTo("gradlePluginPortal", "https://plugins.gradle.org/m2/")
     publishReleasesTo("hboydDev", "https://repo.hboyd.dev/releases")
     publishSnapshotsTo("hboydDev", "https://repo.hboyd.dev/snapshots")
 
