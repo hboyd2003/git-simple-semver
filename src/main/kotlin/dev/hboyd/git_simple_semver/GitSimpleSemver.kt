@@ -31,6 +31,7 @@ abstract class GitSimpleSemver : Plugin<Project> {
 
         project.afterEvaluate {
             project.version = extension.version
+            logger.lifecycle("Resolved Version: ${project.version}")
         }
 
         project.tasks.register(
