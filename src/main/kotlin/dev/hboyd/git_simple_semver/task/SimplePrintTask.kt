@@ -16,7 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package dev.hboyd.git_simple_semver
+package dev.hboyd.git_simple_semver.task
 
 import org.gradle.api.DefaultTask
 import org.gradle.api.tasks.TaskAction
