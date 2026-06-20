@@ -40,7 +40,7 @@ abstract class GitSimpleSemver : Plugin<Project> {
             SimplePrintTask::class.java,
             { extension.version },
             "Prints the current version",
-            "other"
+            "versioning"
         )
 
         project.tasks.register(
@@ -48,7 +48,7 @@ abstract class GitSimpleSemver : Plugin<Project> {
             SimplePrintTask::class.java,
             { extension.version.buildCoreVersionString() },
             "Prints the current version without any pre-release or build metadata identifiers",
-            "other"
+            "versioning"
         )
 
         project.tasks.register(
@@ -56,7 +56,7 @@ abstract class GitSimpleSemver : Plugin<Project> {
             SimplePrintTask::class.java,
             { extension.version.buildVersionString(includePreReleaseLabel = true, includeBuildMetadataLabel = false) },
             "Prints the current version without any build metadata identifiers",
-            "other"
+            "versioning"
         )
 
         project.tasks.register(
@@ -64,7 +64,7 @@ abstract class GitSimpleSemver : Plugin<Project> {
             SimplePrintTask::class.java,
             { extension.versionContext },
             "Prints the context used to generate the version",
-            "other"
+            "versioning"
         )
     }
 }
