@@ -19,6 +19,7 @@
 package dev.hboyd.git_simple_semver
 
 import dev.hboyd.git_simple_semver.task.SimplePrintTask
+import dev.hboyd.git_simple_semver.task.TagTask
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.plugins.JavaPlugin
@@ -64,6 +65,15 @@ abstract class GitSimpleSemver : Plugin<Project> {
             SimplePrintTask::class.java,
             { extension.versionContext },
             "Prints the context used to generate the version",
+            "versioning"
+        )
+
+        project.tasks.register(
+            "tagWithCoreVersion",
+            TagTask::class.java,
+            { extension.versionTagPrefix.get() + extension.coreVersion },
+            { extension.versionTagPrefix.get() + extension.coreVersion },
+            "Creates a new annotated tag with the current core version with the configured prefix",
             "versioning"
         )
     }
