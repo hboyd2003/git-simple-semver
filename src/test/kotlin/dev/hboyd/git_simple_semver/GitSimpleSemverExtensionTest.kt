@@ -81,7 +81,7 @@ class GitSimpleSemverExtensionTest {
         git.tag().setName("v1.2.3").call()
         commitRandom(git, "api: change public contract")
 
-        executeGradleRun("printCoreVersion").assertPrintedVersion("2.2.3", "printCoreVersion")
+        executeGradleRun("printCoreVersion").assertPrintedVersion("2.0.0", "printCoreVersion")
     }
 
     @Test
@@ -95,7 +95,7 @@ class GitSimpleSemverExtensionTest {
         git.tag().setName("v1.2.3").call()
         commitRandom(git, "deps: update dependency")
 
-        executeGradleRun("printCoreVersion").assertPrintedVersion("1.3.3", "printCoreVersion")
+        executeGradleRun("printCoreVersion").assertPrintedVersion("1.3.0", "printCoreVersion")
     }
 
     @Test
