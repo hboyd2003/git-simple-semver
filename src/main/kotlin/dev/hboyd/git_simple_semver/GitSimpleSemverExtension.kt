@@ -83,7 +83,7 @@ abstract class GitSimpleSemverExtension @Inject constructor(
      * Commits that will be ignored when calculating the version.
      */
     val ignoredCommitRegex: Property<String> = objects.property(String::class.java)
-        .convention("^(?:FIXUP|MERGE|Merge).*")
+        .convention("^(?:FIXUP|AMEND|MERGE|Merge).*")
 
     /**
      * The prefix given to version tags.
