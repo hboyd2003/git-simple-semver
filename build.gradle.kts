@@ -46,6 +46,13 @@ indra {
     }
 }
 
+// Configures the publication versions to not include build metadata. Must be done after configuration as the maven publication version is not yet lazy.
+rootProject.afterEvaluate {
+    rootProject.extensions.getByType(PublishingExtension::class.java).publications.withType(MavenPublication::class.java).configureEach {
+        version = project.version.toString().replaceAfterLast('+', "").removeSuffix("+")
+    }
+}
+
 indraSpotlessLicenser {
     licenseHeaderFile(rootProject.file(".spotless/license_header_template.txt"))
     newLine(true)
