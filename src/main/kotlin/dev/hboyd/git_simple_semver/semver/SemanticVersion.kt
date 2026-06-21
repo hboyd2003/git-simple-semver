@@ -47,8 +47,8 @@ open class SemanticVersion(
             version.major,
             version.minor,
             version.patch,
-            version.preReleaseLabel,
-            version.buildMetadataLabel,
+            SemanticLabel.PreRelease(version.preReleaseLabel),
+            SemanticLabel.BuildMetadata(version.buildMetadataLabel),
         )
     }
 
