@@ -68,7 +68,8 @@ abstract class GitSimpleSemverExtension @Inject constructor(
                 changeSpec("style"),
                 changeSpec("docs"),
                 changeSpec("test"),
-                changeSpec("chore(deps)"),
+                changeSpec("chore"),
+                changeSpec("build")
                 )
         )
 
