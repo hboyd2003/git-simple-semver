@@ -18,11 +18,13 @@
 
 package dev.hboyd.git_simple_semver
 
+import dev.hboyd.git_simple_semver.semver.SemanticVersion
 import dev.hboyd.git_simple_semver.task.SimplePrintTask
 import dev.hboyd.git_simple_semver.task.TagTask
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.plugins.JavaPlugin
+import java.io.Serializable
 
 abstract class GitSimpleSemver : Plugin<Project> {
 
@@ -31,8 +33,16 @@ abstract class GitSimpleSemver : Plugin<Project> {
         val extension: GitSimpleSemverExtension =
             extensions.create("gitSimpleSemver", GitSimpleSemverExtension::class.java)
 
+        // "Lazily" resolve the version to ensure it is resolved as early as possible.
+        project.version = object : Serializable {
+            private val version: SemanticVersion by lazy { extension.version }
+
+            override fun toString(): String {
+                return if (project.state.executed) version.toString() else Project.DEFAULT_VERSION
+            }
+        }
+
         project.afterEvaluate {
-            project.version = extension.version
             logger.lifecycle("Resolved Version: ${project.version}")
         }
 
