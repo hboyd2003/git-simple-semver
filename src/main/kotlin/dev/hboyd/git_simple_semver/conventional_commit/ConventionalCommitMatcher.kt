@@ -34,7 +34,7 @@ class ConventionalCommitMatcher(
         type: String = ".*",
         scope: String = ".*",
         description: String = ".*",
-        body: String = ".*",
+        body: String = "(.|\n)*",
         footerKey: String = ".*",
         footerValue: String = ".*",
         breakingChange: Boolean? = null
