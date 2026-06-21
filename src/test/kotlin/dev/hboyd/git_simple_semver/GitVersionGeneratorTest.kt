@@ -88,8 +88,24 @@ class GitVersionGeneratorTest {
     }
 
     @Test
-    fun `generated version ignores tags on other branches`() {
+    fun `version is generated while in a detached head`() {
+        val git: Git = setupGitRepo(testProjectDir, initialCommit = false)
+        commitRandom(git, "fix: fix bug")
+        git.tag().setName("v1.0.0").call()
+        git.checkout().setName("v1.0.0").call()
 
+        val version = GitVersionGenerator(
+            listOf(),
+            listOf(ConventionalCommitMatcher("feat")),
+            listOf(ConventionalCommitMatcher("fix")),
+            true,
+            "".toRegex(),
+            "v",
+            listOf(),
+            listOf()
+        ).generateVersion(git.repository)
+
+        Assertions.assertEquals("1.0.0", version.toString())
     }
 
     @Test

@@ -131,11 +131,11 @@ class GitVersionGenerator(
         ): VersionProviderContext {
             check(!(repository.isBare)) { "Repository must be a non-bare repository" }
 
-            val branchRef: Ref? = repository.findRef(repository.branch)
+            val branchRef: Ref? = repository.findRef(repository.branch) ?: repository.exactRef(Constants.HEAD)
 
             val commits: Map<ObjectId, RevCommit>
             val versionTags: List<SemanticVersionTag>
-            if (branchRef != null) {
+            if (branchRef != null && branchRef.objectId != null) {
                 RevWalk(repository).use { walker ->
                     walker.markStart(walker.parseCommit(branchRef.objectId))
 
