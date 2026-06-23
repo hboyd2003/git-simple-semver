@@ -19,13 +19,17 @@
 package dev.hboyd.git_simple_semver
 
 import dev.hboyd.git_simple_semver.conventional_commit.ConventionalCommitMatcher
+import dev.hboyd.git_simple_semver.git_semver.BumpType
 import dev.hboyd.git_simple_semver.git_semver.GitVersionGenerator
+import dev.hboyd.git_simple_semver.semver.SemanticVersion
 import org.eclipse.jgit.api.Git
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.io.CleanupMode
 import org.junit.jupiter.api.io.TempDir
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.EnumSource
 import java.io.File
 
 @TestInstance(TestInstance.Lifecycle.PER_METHOD)
@@ -177,6 +181,52 @@ class GitVersionGeneratorTest {
         Assertions.assertEquals("2.0.0", version.toString())
     }
 
+    @ParameterizedTest
+    @EnumSource(value = BumpType::class)
+    fun `generated version bumps with minimum bump when commits after release exist but non match any bump`(bumpType: BumpType) {
+        val git: Git = setupGitRepo(testProjectDir)
+        val initialVersion = SemanticVersion(1, 0, 0)
+        git.tag().setName("v$initialVersion").call()
+        commitRandom(git, "nonematch: fix bug")
+
+        val version = GitVersionGenerator(
+            listOf(),
+            listOf(ConventionalCommitMatcher("feat")),
+            listOf(ConventionalCommitMatcher("fix")),
+            true,
+            "".toRegex(),
+            "v",
+            listOf(),
+            listOf(),
+            bumpType
+        ).generateVersion(git.repository)
+
+
+        Assertions.assertEquals(initialVersion.bump(bumpType), version)
+    }
+
+    @Test
+    fun `generated version does not bump based on the minimum bump when bumping commits after release exist`() {
+        val git: Git = setupGitRepo(testProjectDir)
+        git.tag().setName("v1.0.0").call()
+        commitRandom(git, "fix: fix bug")
+
+        val version = GitVersionGenerator(
+            listOf(),
+            listOf(ConventionalCommitMatcher("feat")),
+            listOf(ConventionalCommitMatcher("fix")),
+            true,
+            "".toRegex(),
+            "v",
+            listOf(),
+            listOf(),
+            BumpType.MAJOR
+        ).generateVersion(git.repository)
+
+
+        Assertions.assertEquals("1.0.1", version.toString())
+    }
+
     @Test
     fun `context ignores commits on other branches`() {
         val git: Git = setupGitRepo(testProjectDir)
@@ -189,7 +239,9 @@ class GitVersionGeneratorTest {
 
         val context = GitVersionGenerator.createVersionProviderContext(git.repository)
         Assertions.assertEquals(3, context.commits.size)
-        Assertions.assertEquals(listOf("feat: add feature", "fix: fix bug", "chore: initial commit"), context.commits.map { it.commit.shortMessage })
+        Assertions.assertEquals(
+            listOf("feat: add feature", "fix: fix bug", "chore: initial commit"),
+            context.commits.map { it.commit.shortMessage })
     }
 
     @Test
@@ -235,4 +287,6 @@ class GitVersionGeneratorTest {
         Assertions.assertEquals(3, context.versionTags.size)
         Assertions.assertEquals(listOf("v1.1.0", "v2.1.0", "v1.0.0"), context.versionTags.map { it.toString() })
     }
+
+
 }

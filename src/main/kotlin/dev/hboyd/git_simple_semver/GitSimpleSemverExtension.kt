@@ -74,6 +74,14 @@ abstract class GitSimpleSemverExtension @Inject constructor(
         )
 
     /**
+     * The minimum bump to be applied if there are commits since the last release tag and none of those commits
+     * are matched with the change selectors.
+     */
+    val minimumVersionBump: Property<BumpType> = objects.property(BumpType::class.java)
+        .convention(BumpType.PATCH)
+
+
+    /**
      * If true, major changes will be considered minor changes when no release has been made yet.
      */
     val considerMajorChangesAsMinorWhenNoRelease: Property<Boolean> = objects.property(Boolean::class.java)
@@ -123,7 +131,8 @@ abstract class GitSimpleSemverExtension @Inject constructor(
             ignoredCommitRegex.get().toRegex(),
             versionTagPrefix.get(),
             preReleaseIdentifierProviders.get(),
-            buildIdentifierProviders.get()
+            buildIdentifierProviders.get(),
+            minimumVersionBump.get()
         )
     }
 

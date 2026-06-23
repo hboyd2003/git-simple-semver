@@ -18,6 +18,8 @@
 
 package dev.hboyd.git_simple_semver
 
+import dev.hboyd.git_simple_semver.git_semver.BumpType
+import dev.hboyd.git_simple_semver.semver.SemanticVersion
 import org.eclipse.jgit.api.Git
 import org.gradle.testkit.runner.BuildResult
 import org.gradle.testkit.runner.GradleRunner
@@ -25,6 +27,8 @@ import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.io.CleanupMode
 import org.junit.jupiter.api.io.TempDir
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.EnumSource
 import java.nio.file.Path
 import kotlin.io.path.writeText
 
@@ -41,6 +45,7 @@ class GitSimpleSemverExtensionTest {
         import dev.hboyd.git_simple_semver.git_semver.currentCommitHashProvider
         import dev.hboyd.git_simple_semver.git_semver.dateTimeProvider
         import dev.hboyd.git_simple_semver.git_semver.textProvider
+        import dev.hboyd.git_simple_semver.git_semver.BumpType
             
         plugins {
             id("dev.hboyd.git-simple-semver")
@@ -57,7 +62,7 @@ class GitSimpleSemverExtensionTest {
         git.tag().setName("v1.2.3").call()
         commitRandom(git, "misc: misc commit")
 
-        executeGradleRun("printVersion").assertPrintedVersion("1.2.3-SNAPSHOT+1")
+        executeGradleRun("printVersion").assertPrintedVersion("1.2.4-SNAPSHOT+1")
     }
 
     @Test
@@ -66,7 +71,7 @@ class GitSimpleSemverExtensionTest {
         git.tag().setName("v1.2.3").call()
         commitRandom(git, "misc: misc commit")
 
-        executeGradleRun("printCoreVersion").assertPrintedVersion("1.2.3", "printCoreVersion")
+        executeGradleRun("printCoreVersion").assertPrintedVersion("1.2.4", "printCoreVersion")
     }
 
     @Test
@@ -151,6 +156,22 @@ class GitSimpleSemverExtensionTest {
 
         executeGradleRun("printCoreVersion").assertPrintedVersion("1.2.4", "printCoreVersion")
     }
+
+    @ParameterizedTest
+    @EnumSource(value = BumpType::class)
+    fun `minimum version bump controls the minimum bump when commits after release exist but non match any bump`(bumpType: BumpType) {
+        val git = generateGradleProject(
+            """
+            minimumVersionBump.set(BumpType.${bumpType.name})
+            """.trimIndent()
+        )
+        val initialVersion = SemanticVersion(1, 0, 0)
+        git.tag().setName("v$initialVersion").call()
+        commitRandom(git, "nomatch: real bug fix")
+
+        executeGradleRun("printCoreVersion").assertPrintedVersion(initialVersion.bump(bumpType).toString(), "printCoreVersion")
+    }
+
 
     @Test
     fun `pre release identifier providers append pre release identifiers`() {

@@ -44,6 +44,7 @@ class GitVersionGenerator(
     val versionTagPrefix: String,
     val preReleaseIdentifierProviders: List<SemanticVersionIdentifierProvider>,
     val buildIdentifierProviders: List<SemanticVersionIdentifierProvider>,
+    val minimumVersionBump: BumpType = BumpType.NONE,
 ) {
     /**
      * Generates a version for the given [repositoryDir].
@@ -86,16 +87,19 @@ class GitVersionGenerator(
 
         var bump: BumpType = BumpType.NONE
         if (startCommit != null) {
-            bump =
-                versionProviderContext.commits.subList(0, versionProviderContext.commits.indexOf(startCommit))
-                    .maxOfOrNull { commit ->
-                        when {
-                            majorChangeMatchers.any { it.matches(commit) } || commit.breakingChange -> BumpType.MAJOR
-                            minorChangeMatchers.any { it.matches(commit) } -> BumpType.MINOR
-                            patchChangeMatchers.any { it.matches(commit) } -> BumpType.PATCH
-                            else -> BumpType.NONE
-                        }
-                    } ?: BumpType.NONE
+            bump = versionProviderContext.commits.subList(0, versionProviderContext.commits.indexOf(startCommit))
+                .maxOfOrNull { commit ->
+                    when {
+                        majorChangeMatchers.any { it.matches(commit) } || commit.breakingChange -> BumpType.MAJOR
+                        minorChangeMatchers.any { it.matches(commit) } -> BumpType.MINOR
+                        patchChangeMatchers.any { it.matches(commit) } -> BumpType.PATCH
+                        else -> BumpType.NONE
+                    }
+                } ?: BumpType.NONE
+        }
+
+        versionProviderContext.commitsSinceLastReleaseVersionTag?.let {
+            if (bump == BumpType.NONE && it > 0) bump = minimumVersionBump
         }
 
         if (bump == BumpType.MAJOR && considerMajorChangesAsMinorWhenNoRelease && lastReleaseTag == null)
