@@ -12,8 +12,8 @@ primarily intended for easy customization of the version and to make it easier t
 
 For releases:
 ```kotlin
-// Release builds are published to Maven Central
-mavenCentral()
+// Release builds are published to Gradle Plugin Portal
+gradlePluginPortal()
 maven {
     name = "hboyd-dev-repo-releases"
     url = uri("https://repo.hboyd.dev/releases/")
