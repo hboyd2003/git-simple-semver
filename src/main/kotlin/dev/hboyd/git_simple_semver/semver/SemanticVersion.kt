@@ -19,6 +19,7 @@
 package dev.hboyd.git_simple_semver.semver
 
 import dev.hboyd.git_simple_semver.git_semver.BumpType
+import java.io.Serializable
 
 /**
  * Represents a version 2.0.0 semantic version.
@@ -31,7 +32,7 @@ open class SemanticVersion(
     var patch: Int,
     val preReleaseLabel: SemanticLabel.PreRelease = SemanticLabel.PreRelease(),
     val buildMetadataLabel: SemanticLabel.BuildMetadata = SemanticLabel.BuildMetadata(),
-) : Comparable<SemanticVersion>, java.io.Serializable {
+) : Comparable<SemanticVersion>, Serializable {
     companion object {
         /**
          * A regex that matches an entire semantic version string.

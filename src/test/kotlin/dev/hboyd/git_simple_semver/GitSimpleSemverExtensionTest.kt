@@ -46,6 +46,11 @@ class GitSimpleSemverExtensionTest {
         import dev.hboyd.git_simple_semver.git_semver.dateTimeProvider
         import dev.hboyd.git_simple_semver.git_semver.textProvider
         import dev.hboyd.git_simple_semver.git_semver.BumpType
+        import dev.hboyd.git_simple_semver.LazyVersion
+        import java.io.FileInputStream
+        import java.io.FileOutputStream
+        import java.io.ObjectInputStream
+        import java.io.ObjectOutputStream
             
         plugins {
             id("dev.hboyd.git-simple-semver")
@@ -159,7 +164,9 @@ class GitSimpleSemverExtensionTest {
 
     @ParameterizedTest
     @EnumSource(value = BumpType::class)
-    fun `minimum version bump controls the minimum bump when commits after release exist but non match any bump`(bumpType: BumpType) {
+    fun `minimum version bump controls the minimum bump when commits after release exist but non match any bump`(
+        bumpType: BumpType
+    ) {
         val git = generateGradleProject(
             """
             minimumVersionBump.set(BumpType.${bumpType.name})
@@ -169,7 +176,10 @@ class GitSimpleSemverExtensionTest {
         git.tag().setName("v$initialVersion").call()
         commitRandom(git, "nomatch: real bug fix")
 
-        executeGradleRun("printCoreVersion").assertPrintedVersion(initialVersion.bump(bumpType).toString(), "printCoreVersion")
+        executeGradleRun("printCoreVersion").assertPrintedVersion(
+            initialVersion.bump(bumpType).toString(),
+            "printCoreVersion"
+        )
     }
 
 
@@ -213,6 +223,33 @@ class GitSimpleSemverExtensionTest {
         commitRandom(git, "fix: real bug fix")
 
         executeGradleRun("printVersion").assertPrintedVersion("1.2.4+build-123")
+    }
+
+    @Test
+    fun `set version is serializable`() {
+        val git = generateGradleProject(
+            $$"""
+        project.afterEvaluate {
+            val versionPath = project.projectDir.resolve("version")
+            FileOutputStream(project.projectDir.resolve("version")).use {
+                ObjectOutputStream(it).use { outputStream ->
+                    outputStream.writeObject(project.version)
+                }
+            }
+        
+            FileInputStream(versionPath).use {
+                ObjectInputStream(it).use { inputStream ->
+                    val version: Any = inputStream.readObject()
+                    println("Version: $version")
+                }
+            }
+        }
+        """.trimIndent()
+        )
+        git.tag().setName("v1.2.3").call()
+        commitRandom(git, "misc: misc commit")
+
+        executeGradleRun("printVersion")
     }
 
     private fun generateGradleProject(pluginConfig: String): Git {
