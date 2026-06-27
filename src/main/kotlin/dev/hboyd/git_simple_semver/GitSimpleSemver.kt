@@ -23,6 +23,8 @@ import dev.hboyd.git_simple_semver.task.TagTask
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.plugins.JavaPlugin
+import org.gradle.api.publish.PublishingExtension
+import org.gradle.api.publish.maven.MavenPublication
 
 abstract class GitSimpleSemver : Plugin<Project> {
 
@@ -34,7 +36,23 @@ abstract class GitSimpleSemver : Plugin<Project> {
         // "Lazily" resolve the version to ensure it is resolved as early as possible.
         project.version = LazyVersion({ extension.version.toString() }, { project.state.executed })
 
-        project.afterEvaluate {
+        allprojects {
+            it.afterEvaluate { project ->
+                if (!extension.includeBuildIdentifierInPublishedVersion.get()
+                    && project.plugins.hasPlugin("maven-publish")
+                ) {
+                    project.extensions.getByType(PublishingExtension::class.java).publications
+                        .withType(MavenPublication::class.java).configureEach { publication ->
+                            publication.version = extension.version.buildVersionString(
+                                includePreReleaseLabel = true,
+                                includeBuildMetadataLabel = false
+                            )
+                        }
+                }
+            }
+        }
+
+        afterEvaluate {
             logger.lifecycle("Resolved Version: ${project.version}")
         }
 

@@ -80,6 +80,11 @@ abstract class GitSimpleSemverExtension @Inject constructor(
     val minimumVersionBump: Property<BumpType> = objects.property(BumpType::class.java)
         .convention(BumpType.PATCH)
 
+    /**
+     * Include the build identifier in the Maven publication version.
+     */
+    val includeBuildIdentifierInPublishedVersion: Property<Boolean> = objects.property(Boolean::class.java)
+        .convention(false)
 
     /**
      * If true, major changes will be considered minor changes when no release has been made yet.

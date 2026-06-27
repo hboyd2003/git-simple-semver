@@ -63,7 +63,7 @@ class GitSimpleSemverExtensionTest {
 
     @Test
     fun `print version task prints the current version`() {
-        val git = generateGradleProject("")
+        val git = generateGradleProject()
         git.tag().setName("v1.2.3").call()
         commitRandom(git, "misc: misc commit")
 
@@ -72,7 +72,7 @@ class GitSimpleSemverExtensionTest {
 
     @Test
     fun `print core version task prints only the core version`() {
-        val git = generateGradleProject("")
+        val git = generateGradleProject()
         git.tag().setName("v1.2.3").call()
         commitRandom(git, "misc: misc commit")
 
@@ -182,6 +182,77 @@ class GitSimpleSemverExtensionTest {
         )
     }
 
+    @Test
+    fun `include build identifier in published version false doesn't include build identifier in published version`() {
+        val git = generateGradleProjectUsingBuildFile(
+            $$"""
+            import dev.hboyd.git_simple_semver.git_semver.SemanticVersionIdentifierProvider
+                
+            plugins {
+                id("dev.hboyd.git-simple-semver")
+                id("maven-publish")
+            }
+            
+            gitSimpleSemver {
+                includeBuildIdentifierInPublishedVersion.set(false)
+                buildIdentifierProviders.set(listOf(SemanticVersionIdentifierProvider { "buildIdentifier" }))
+            }
+            
+            publishing {
+                publications {
+                    create<MavenPublication>("fakePublication") {
+                    }
+                }
+            }
+            
+            project.afterEvaluate {
+                for (publication in rootProject.extensions.getByType(PublishingExtension::class.java)
+                    .publications.withType(MavenPublication::class.java)) {
+                    logger.lifecycle("> Task :publicationVersion\n${publication.version}")
+                }
+            }
+            """.trimIndent()
+        )
+        git.tag().setName("v1.0.0").call()
+        commitRandom(git, "fix: real bug fix")
+        executeGradleRun("printVersion").assertPrintedVersion("1.0.1-SNAPSHOT", "publicationVersion")
+    }
+
+    @Test
+    fun `include build identifier in published version true includes build identifier in published version`() {
+        val git = generateGradleProjectUsingBuildFile(
+            $$"""
+            import dev.hboyd.git_simple_semver.git_semver.SemanticVersionIdentifierProvider
+                
+            plugins {
+                id("dev.hboyd.git-simple-semver")
+                id("maven-publish")
+            }
+            
+            gitSimpleSemver {
+                includeBuildIdentifierInPublishedVersion.set(true)
+                buildIdentifierProviders.set(listOf(SemanticVersionIdentifierProvider { "buildIdentifier" }))
+            }
+            
+            publishing {
+                publications {
+                    create<MavenPublication>("fakePublication") {
+                    }
+                }
+            }
+            
+            project.afterEvaluate {
+                for (publication in rootProject.extensions.getByType(PublishingExtension::class.java)
+                    .publications.withType(MavenPublication::class.java)) {
+                    logger.lifecycle("> Task :publicationVersion\n${publication.version}")
+                }
+            }
+            """.trimIndent()
+        )
+        git.tag().setName("v1.0.0").call()
+        commitRandom(git, "fix: real bug fix")
+        executeGradleRun("printVersion").assertPrintedVersion("1.0.1-SNAPSHOT+buildIdentifier", "publicationVersion")
+    }
 
     @Test
     fun `pre release identifier providers append pre release identifiers`() {
@@ -252,13 +323,17 @@ class GitSimpleSemverExtensionTest {
         executeGradleRun("printVersion")
     }
 
-    private fun generateGradleProject(pluginConfig: String): Git {
+    private fun generateGradleProject(pluginConfig: String = ""): Git {
+        return generateGradleProjectUsingBuildFile(String.format(baseGradleBuild, pluginConfig))
+    }
+
+    private fun generateGradleProjectUsingBuildFile(buildFileText: String): Git {
         testProjectDir.resolve("settings.gradle.kts").writeText(
             """
             rootProject.name = "git-simple-semver-test"
             """.trimIndent()
         )
-        testProjectDir.resolve("build.gradle.kts").writeText(String.format(baseGradleBuild, pluginConfig))
+        testProjectDir.resolve("build.gradle.kts").writeText(buildFileText)
         return setupGitRepo(testProjectDir.toFile())
     }
 
