@@ -323,6 +323,21 @@ class GitSimpleSemverExtensionTest {
         executeGradleRun("printVersion")
     }
 
+    @Test
+    fun `warning exists when version differs from generated version`() {
+        val git = generateGradleProject(
+            """
+            project.version = "wrong version"
+            """.trimIndent()
+        )
+        git.tag().setName("v1.2.3").call()
+        val buildResult = executeGradleRun("printVersion")
+        Assertions.assertTrue {
+            buildResult.output.lines()
+                .contains("Project git-simple-semver-test has the version of \"wrong version\" which differs from the generated version of \"1.2.3\".")
+        }
+    }
+
     private fun generateGradleProject(pluginConfig: String = ""): Git {
         return generateGradleProjectUsingBuildFile(String.format(baseGradleBuild, pluginConfig))
     }

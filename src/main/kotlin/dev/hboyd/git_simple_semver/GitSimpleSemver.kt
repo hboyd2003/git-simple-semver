@@ -38,6 +38,10 @@ abstract class GitSimpleSemver : Plugin<Project> {
 
         allprojects {
             it.afterEvaluate { project ->
+                if (project.version.toString() != extension.version.toString()) {
+                    logger.warn("Project ${project.name} has the version of \"${project.version}\" which differs from the generated version of \"${extension.version}\".")
+                }
+
                 if (!extension.includeBuildIdentifierInPublishedVersion.get()
                     && project.plugins.hasPlugin("maven-publish")
                 ) {
@@ -53,7 +57,7 @@ abstract class GitSimpleSemver : Plugin<Project> {
         }
 
         afterEvaluate {
-            logger.lifecycle("Resolved Version: ${project.version}")
+            logger.lifecycle("GitSimpleSemver Resolved Version: ${project.version}")
         }
 
         project.tasks.register(
