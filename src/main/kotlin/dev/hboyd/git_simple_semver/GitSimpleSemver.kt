@@ -60,7 +60,7 @@ abstract class GitSimpleSemver : Plugin<Project> {
             logger.lifecycle("GitSimpleSemver Resolved Version: ${extension.version}")
         }
 
-        project.tasks.register(
+        tasks.register(
             "printVersion",
             SimplePrintTask::class.java,
             { extension.version },
@@ -68,7 +68,7 @@ abstract class GitSimpleSemver : Plugin<Project> {
             "versioning"
         )
 
-        project.tasks.register(
+        tasks.register(
             "printCoreVersion",
             SimplePrintTask::class.java,
             { extension.version.buildCoreVersionString() },
@@ -76,7 +76,7 @@ abstract class GitSimpleSemver : Plugin<Project> {
             "versioning"
         )
 
-        project.tasks.register(
+        tasks.register(
             "printVersionWithoutBuildMetadata",
             SimplePrintTask::class.java,
             { extension.version.buildVersionString(includePreReleaseLabel = true, includeBuildMetadataLabel = false) },
@@ -84,7 +84,7 @@ abstract class GitSimpleSemver : Plugin<Project> {
             "versioning"
         )
 
-        project.tasks.register(
+        tasks.register(
             "printVersionContext",
             SimplePrintTask::class.java,
             { extension.versionContext },
@@ -92,7 +92,7 @@ abstract class GitSimpleSemver : Plugin<Project> {
             "versioning"
         )
 
-        project.tasks.register(
+        tasks.register(
             "tagWithCoreVersion",
             TagTask::class.java,
             { extension.versionTagPrefix.get() + extension.coreVersion },
