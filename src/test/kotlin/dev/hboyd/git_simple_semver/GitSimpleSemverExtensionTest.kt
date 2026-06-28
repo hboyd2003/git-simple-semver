@@ -47,8 +47,8 @@ class GitSimpleSemverExtensionTest {
         import dev.hboyd.git_simple_semver.git_semver.textProvider
         import dev.hboyd.git_simple_semver.git_semver.BumpType
         import dev.hboyd.git_simple_semver.LazyVersion
-        import java.io.FileInputStream
-        import java.io.FileOutputStream
+        import java.io.ByteArrayOutputStream
+        import java.io.ByteArrayInputStream
         import java.io.ObjectInputStream
         import java.io.ObjectOutputStream
             
@@ -300,27 +300,26 @@ class GitSimpleSemverExtensionTest {
     fun `set version is serializable`() {
         val git = generateGradleProject(
             $$"""
-        project.afterEvaluate {
-            val versionPath = project.projectDir.resolve("version")
-            FileOutputStream(project.projectDir.resolve("version")).use {
-                ObjectOutputStream(it).use { outputStream ->
-                    outputStream.writeObject(project.version)
+            project.afterEvaluate {
+                val byteArrayOutputStream = ByteArrayOutputStream()
+                byteArrayOutputStream.use {
+                    ObjectOutputStream(it).use { outputStream ->
+                        outputStream.writeObject(project.version)
+                    }
+                }
+            
+                ByteArrayInputStream(byteArrayOutputStream.toByteArray()).use {
+                    ObjectInputStream(it).use { inputStream ->
+                        logger.lifecycle("> Task :readVersion\n${inputStream.readObject()}")
+                    }
                 }
             }
-        
-            FileInputStream(versionPath).use {
-                ObjectInputStream(it).use { inputStream ->
-                    val version: Any = inputStream.readObject()
-                    println("Version: $version")
-                }
-            }
-        }
-        """.trimIndent()
+            """.trimIndent()
         )
         git.tag().setName("v1.2.3").call()
         commitRandom(git, "misc: misc commit")
 
-        executeGradleRun("printVersion")
+        executeGradleRun("printVersion").assertPrintedVersion("1.2.4-SNAPSHOT+1", "readVersion")
     }
 
     @Test
