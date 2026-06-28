@@ -58,9 +58,9 @@ class GitSimpleSemverExtensionTest {
         }
         
         gitSimpleSemver {
-            %s
+        %s
         }
-    """.trimIndent()
+        """.trimIndent()
 
     @Test
     fun `print version task prints the current version`() {
@@ -84,10 +84,10 @@ class GitSimpleSemverExtensionTest {
     fun `major change selections control major version bumps`() {
         val git = generateGradleProject(
             """
-            majorChangeSelections.set(listOf(changeSpec("api")))
-            minorChangeSelections.set(emptyList())
-            patchChangeSelections.set(emptyList())
-            """.trimIndent()
+            |    majorChangeSelections.set(listOf(changeSpec("api")))
+            |    minorChangeSelections.set(emptyList())
+            |    patchChangeSelections.set(emptyList())
+            """.trimMargin()
         )
         git.tag().setName("v1.2.3").call()
         commitRandom(git, "api: change public contract")
@@ -99,9 +99,9 @@ class GitSimpleSemverExtensionTest {
     fun `minor change selections control minor version bumps`() {
         val git = generateGradleProject(
             """
-            minorChangeSelections.set(listOf(changeSpec("deps")))
-            patchChangeSelections.set(emptyList())
-            """.trimIndent()
+            |    minorChangeSelections.set(listOf(changeSpec("deps")))
+            |    patchChangeSelections.set(emptyList())
+            """.trimMargin()
         )
         git.tag().setName("v1.2.3").call()
         commitRandom(git, "deps: update dependency")
@@ -113,9 +113,9 @@ class GitSimpleSemverExtensionTest {
     fun `patch change selections control patch version bumps`() {
         val git = generateGradleProject(
             """
-            minorChangeSelections.set(emptyList())
-            patchChangeSelections.set(listOf(changeSpec("chore")))
-            """.trimIndent()
+            |    minorChangeSelections.set(emptyList())
+            |    patchChangeSelections.set(listOf(changeSpec("chore")))
+            """.trimMargin()
         )
         git.tag().setName("v1.2.3").call()
         commitRandom(git, "chore: update build")
@@ -127,8 +127,8 @@ class GitSimpleSemverExtensionTest {
     fun `consider major changes as minor when no release controls first breaking change bump`() {
         val git = generateGradleProject(
             """
-            considerMajorChangesAsMinorWhenNoRelease.set(false)
-            """.trimIndent()
+            |    considerMajorChangesAsMinorWhenNoRelease.set(false)
+            """.trimMargin()
         )
         commitRandom(git, "feat!: replace api")
 
@@ -139,8 +139,8 @@ class GitSimpleSemverExtensionTest {
     fun `ignored commit regex excludes matching commits from version bumps`() {
         val git = generateGradleProject(
             """
-            ignoredCommitRegex.set("^skip:.*")
-            """.trimIndent()
+            |    ignoredCommitRegex.set("^skip:.*")
+            """.trimMargin()
         )
         git.tag().setName("v1.2.3").call()
         commitRandom(git, "skip: feat: ignored feature")
@@ -153,8 +153,8 @@ class GitSimpleSemverExtensionTest {
     fun `version tag prefix controls which tags are considered releases`() {
         val git = generateGradleProject(
             """
-            versionTagPrefix.set("release-")
-            """.trimIndent()
+            |    versionTagPrefix.set("release-")
+            """.trimMargin()
         )
         git.tag().setName("v9.9.9").call()
         git.tag().setName("release-1.2.3").call()
@@ -170,8 +170,8 @@ class GitSimpleSemverExtensionTest {
     ) {
         val git = generateGradleProject(
             """
-            minimumVersionBump.set(BumpType.${bumpType.name})
-            """.trimIndent()
+            |    minimumVersionBump.set(BumpType.${bumpType.name})
+            """.trimMargin()
         )
         val initialVersion = SemanticVersion(1, 0, 0)
         git.tag().setName("v$initialVersion").call()
@@ -259,9 +259,9 @@ class GitSimpleSemverExtensionTest {
     fun `pre release identifier providers append pre release identifiers`() {
         val git = generateGradleProject(
             """
-            preReleaseIdentifierProviders.set(listOf(SemanticVersionIdentifierProvider { "beta" }))
-            buildIdentifierProviders.set(listOf())
-            """.trimIndent()
+            |    preReleaseIdentifierProviders.set(listOf(SemanticVersionIdentifierProvider { "beta" }))
+            |    buildIdentifierProviders.set(listOf())
+            """.trimMargin()
         )
         git.tag().setName("v1.2.3").call()
         commitRandom(git, "fix: real bug fix")
@@ -273,9 +273,9 @@ class GitSimpleSemverExtensionTest {
     fun `pre release and build-metadata identifiers are not included in core version`() {
         val git = generateGradleProject(
             """
-            preReleaseIdentifierProviders.set(listOf(SemanticVersionIdentifierProvider { "beta" }))
-            buildIdentifierProviders.set(listOf(SemanticVersionIdentifierProvider { "build-123" }))            
-            """.trimIndent()
+            |    preReleaseIdentifierProviders.set(listOf(SemanticVersionIdentifierProvider { "beta" }))
+            |    buildIdentifierProviders.set(listOf(SemanticVersionIdentifierProvider { "build-123" }))
+            """.trimMargin()
         )
         git.tag().setName("v1.2.3").call()
         commitRandom(git, "fix: real bug fix")
@@ -287,9 +287,9 @@ class GitSimpleSemverExtensionTest {
     fun `build identifier providers append build metadata identifiers`() {
         val git = generateGradleProject(
             """
-            buildIdentifierProviders.set(listOf(SemanticVersionIdentifierProvider { "build-123" }))
-            preReleaseIdentifierProviders.set(listOf())
-            """.trimIndent()
+            |    buildIdentifierProviders.set(listOf(SemanticVersionIdentifierProvider { "build-123" }))
+            |    preReleaseIdentifierProviders.set(listOf())
+            """.trimMargin()
         )
         git.tag().setName("v1.2.3").call()
         commitRandom(git, "fix: real bug fix")
@@ -301,21 +301,20 @@ class GitSimpleSemverExtensionTest {
     fun `set version is serializable`() {
         val git = generateGradleProject(
             $$"""
-            project.afterEvaluate {
-                val byteArrayOutputStream = ByteArrayOutputStream()
-                byteArrayOutputStream.use {
-                    ObjectOutputStream(it).use { outputStream ->
-                        outputStream.writeObject(project.version)
-                    }
-                }
-            
-                ByteArrayInputStream(byteArrayOutputStream.toByteArray()).use {
-                    ObjectInputStream(it).use { inputStream ->
-                        logger.lifecycle("> Task :readVersion\n${inputStream.readObject()}")
-                    }
-                }
-            }
-            """.trimIndent()
+            |    project.afterEvaluate {
+            |        val byteArrayOutputStream = ByteArrayOutputStream()
+            |        byteArrayOutputStream.use {
+            |            ObjectOutputStream(it).use { outputStream ->
+            |                outputStream.writeObject(project.version)
+            |            }
+            |        }   
+            |        ByteArrayInputStream(byteArrayOutputStream.toByteArray()).use {
+            |            ObjectInputStream(it).use { inputStream ->
+            |                logger.lifecycle("> Task :readVersion\n${inputStream.readObject()}")
+            |            }
+            |        }
+            |    }
+            """.trimMargin()
         )
         git.tag().setName("v1.2.3").call()
         commitRandom(git, "misc: misc commit")
@@ -327,8 +326,8 @@ class GitSimpleSemverExtensionTest {
     fun `warning exists when version differs from generated version`() {
         val git = generateGradleProject(
             """
-            project.version = "wrong version"
-            """.trimIndent()
+            |    project.version = "wrong version"
+            """.trimMargin()
         )
         git.tag().setName("v1.2.3").call()
         val buildResult = executeGradleRun("printVersion")
@@ -342,13 +341,13 @@ class GitSimpleSemverExtensionTest {
     fun `subprojects are applied with generated version`() {
         val git = generateGradleProject(
             $$"""
-                buildIdentifierProviders.set(listOf())      
-                subprojects {
-                    afterEvaluate {
-                        logger.lifecycle("> Task :subprojectVersion\n$version")
-                    }
-                }
-            """.trimIndent()
+            |    buildIdentifierProviders.set(listOf())      
+            |    subprojects {
+            |        afterEvaluate {
+            |            logger.lifecycle("> Task :subprojectVersion\n$version")
+            |        }
+            |    }
+            """.trimMargin()
         )
 
         testProjectDir.resolve("subproject").toFile().mkdir()
@@ -367,8 +366,8 @@ class GitSimpleSemverExtensionTest {
     private fun generateGradleProjectUsingBuildFile(buildFileText: String): Git {
         testProjectDir.resolve("settings.gradle.kts").writeText(
             """
-            rootProject.name = "git-simple-semver-test"
-            """.trimIndent()
+            |    rootProject.name = "git-simple-semver-test"
+            """.trimMargin()
         )
         testProjectDir.resolve("build.gradle.kts").writeText(buildFileText)
         return setupGitRepo(testProjectDir.toFile())
