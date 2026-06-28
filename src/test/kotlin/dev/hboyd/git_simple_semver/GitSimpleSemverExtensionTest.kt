@@ -30,6 +30,7 @@ import org.junit.jupiter.api.io.TempDir
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.EnumSource
 import java.nio.file.Path
+import kotlin.io.path.appendText
 import kotlin.io.path.writeText
 
 class GitSimpleSemverExtensionTest {
@@ -335,6 +336,28 @@ class GitSimpleSemverExtensionTest {
             buildResult.output.lines()
                 .contains("Project git-simple-semver-test has the version of \"wrong version\" which differs from the generated version of \"1.2.3\".")
         }
+    }
+
+    @Test
+    fun `subprojects are applied with generated version`() {
+        val git = generateGradleProject(
+            $$"""
+                buildIdentifierProviders.set(listOf())      
+                subprojects {
+                    afterEvaluate {
+                        logger.lifecycle("> Task :subprojectVersion\n$version")
+                    }
+                }
+            """.trimIndent()
+        )
+
+        testProjectDir.resolve("subproject").toFile().mkdir()
+        testProjectDir.resolve("subproject/build.gradle.kts").writeText("")
+        testProjectDir.resolve("settings.gradle.kts").appendText("\ninclude(\"subproject\")")
+        git.add().addFilepattern(".").call()
+        git.commit().setMessage("feat: add subproject").call()
+        git.tag().setName("v1.2.3").call()
+        executeGradleRun("printVersion").assertPrintedVersion("1.2.3", "subprojectVersion")
     }
 
     private fun generateGradleProject(pluginConfig: String = ""): Git {

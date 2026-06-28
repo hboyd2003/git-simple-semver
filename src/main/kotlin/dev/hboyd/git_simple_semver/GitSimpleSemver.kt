@@ -33,10 +33,10 @@ abstract class GitSimpleSemver : Plugin<Project> {
         val extension: GitSimpleSemverExtension =
             extensions.create("gitSimpleSemver", GitSimpleSemverExtension::class.java)
 
-        // "Lazily" resolve the version to ensure it is resolved as early as possible.
-        project.version = LazyVersion({ extension.version.toString() }, { project.state.executed })
-
         allprojects {
+            // "Lazily" resolve the version to ensure it is resolved as early as possible.
+            it.version = LazyVersion({ extension.version.toString() }, { it.state.executed })
+
             it.afterEvaluate { project ->
                 if (project.version.toString() != extension.version.toString()) {
                     logger.warn("Project ${project.name} has the version of \"${project.version}\" which differs from the generated version of \"${extension.version}\".")
