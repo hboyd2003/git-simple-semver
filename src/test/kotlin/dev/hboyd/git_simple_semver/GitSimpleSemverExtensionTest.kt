@@ -380,6 +380,21 @@ class GitSimpleSemverExtensionTest {
         executeGradleRun("printVersion").assertPrintedVersion("1.2.3", "subprojectVersion")
     }
 
+    @Test
+    fun `tagWithVersionWithoutBuildMetadata task creates a tag without build metadata`() {
+        val git = generateGradleProject()
+        git.tag().setName("v1.2.3").call()
+        commitRandom(git, "fix: real bug fix")
+        executeGradleRun("tagWithVersionWithoutBuildMetadata")
+
+        val versionTag: RevTag
+        RevWalk(git.repository).use {
+            versionTag = it.parseTag(git.tagList().call().last().objectId)
+        }
+
+        Assertions.assertEquals("v1.2.4-SNAPSHOT", versionTag.tagName)
+    }
+
     private fun generateGradleProject(pluginConfig: String = ""): Git {
         return generateGradleProjectUsingBuildFile(String.format(baseGradleBuild, pluginConfig))
     }

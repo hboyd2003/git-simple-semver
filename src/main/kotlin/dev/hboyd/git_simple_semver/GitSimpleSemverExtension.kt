@@ -105,7 +105,8 @@ abstract class GitSimpleSemverExtension @Inject constructor(
         .convention("v")
 
     /**
-     * The provider used to generate the tag message for the `tagWithCoreVersion` task.
+     * The provider used to generate the tag message for the `tagWithCoreVersion` and
+     * `tagWithVersionWithoutBuildMetadata` task.
      */
     val versionTagMessageProvider: Property<TagMessageProvider> =
         objects.property(TagMessageProvider::class.java).convention(TagMessageProvider { "v${it}" })

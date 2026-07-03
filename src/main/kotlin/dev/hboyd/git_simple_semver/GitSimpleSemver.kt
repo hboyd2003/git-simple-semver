@@ -18,6 +18,7 @@
 
 package dev.hboyd.git_simple_semver
 
+import dev.hboyd.git_simple_semver.semver.SemanticVersion
 import dev.hboyd.git_simple_semver.task.SimplePrintTask
 import dev.hboyd.git_simple_semver.task.TagTask
 import org.gradle.api.Plugin
@@ -96,9 +97,31 @@ abstract class GitSimpleSemver : Plugin<Project> {
             "tagWithCoreVersion",
             TagTask::class.java,
             { extension.versionTagPrefix.get() + extension.coreVersion },
-            { extension.versionTagPrefix.get() + extension.coreVersion },
             { extension.versionTagMessageProvider.get().getTagMessage(extension.coreVersion) },
-            "Creates an annotated Git tag using the version (excluding the build metadata), applying the configured prefix and message from the versionTagMessageProvider",
+            "Creates an annotated Git tag using the core version, applying the configured prefix and message from the versionTagMessageProvider",
+            "versioning"
+        )
+
+        tasks.register(
+            "tagWithVersionWithoutBuildMetadata",
+            TagTask::class.java,
+            {
+                extension.versionTagPrefix.get() + extension.version.buildVersionString(
+                    includePreReleaseLabel = true,
+                    includeBuildMetadataLabel = false
+                )
+            },
+            {
+                extension.versionTagMessageProvider.get().getTagMessage(
+                    SemanticVersion(
+                        extension.version.major,
+                        extension.version.minor,
+                        extension.version.patch,
+                        extension.version.preReleaseLabel
+                    )
+                )
+            },
+            "Creates an annotated Git tag using the version (without the build metadata), applying the configured prefix and message from the versionTagMessageProvider",
             "versioning"
         )
     }
