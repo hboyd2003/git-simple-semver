@@ -52,8 +52,7 @@ abstract class GitSimpleSemverExtension @Inject constructor(
         objects.listProperty(TypeScopeSelectionSpec::class.java).convention(
             listOf(
                 changeSpec("perf"),
-                changeSpec("feat"),
-                changeSpec("refactor")
+                changeSpec("feat")
             )
         )
 
@@ -69,7 +68,8 @@ abstract class GitSimpleSemverExtension @Inject constructor(
                 changeSpec("docs"),
                 changeSpec("test"),
                 changeSpec("chore"),
-                changeSpec("build")
+                changeSpec("build"),
+                changeSpec("refactor")
                 )
         )
 
