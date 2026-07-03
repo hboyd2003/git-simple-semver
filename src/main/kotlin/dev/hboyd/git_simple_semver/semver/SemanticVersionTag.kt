@@ -45,7 +45,7 @@ abstract class SemanticVersionTag(
 
     companion object {
         /**
-         * Regex that splits has two groups:
+         * Regex that splits the version tag into two groups:
          * 1. The text before the first digit, `\n` or `\r` (if any)
          * 2. The rest of the text
          */
