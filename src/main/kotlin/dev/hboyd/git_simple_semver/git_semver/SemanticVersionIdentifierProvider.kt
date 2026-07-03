@@ -18,14 +18,27 @@
 
 package dev.hboyd.git_simple_semver.git_semver
 
+import dev.hboyd.git_simple_semver.semver.SemanticLabel
+
 /**
  * Provider for a semantic version identifier based on the given [IdentifierProviderContext].
  */
 fun interface SemanticVersionIdentifierProvider {
     /**
-     * Returns a semantic version identifier based on the given [context].
+     * Returns a possibly invalid semantic version identifier based on the given [context].
+     * Returns `null` if there is no identifier to provide.
      */
-    fun getIdentity(context: IdentifierProviderContext): String?
+    fun getIdentityUnsafe(context: IdentifierProviderContext): String?
+
+    /**
+     * Returns a valid semantic version identifier based on the given [context].
+     * Returns `null` if there is no identifier to provide.
+     */
+    fun getIdentity(context: IdentifierProviderContext): String? = getIdentityUnsafe(context).also {
+        require(it == null || it.matches(SemanticLabel.IDENTIFIER_REGEX)) {
+            "Identifier is invalid, must match ${SemanticLabel.IDENTIFIER_REGEX}"
+        }
+    }
 
     /**
      * Returns a new [SemanticVersionIdentifierProvider] that only provides this provider if the repo has any changes
