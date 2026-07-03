@@ -381,6 +381,21 @@ class GitSimpleSemverExtensionTest {
     }
 
     @Test
+    fun `tagWithCoreVersion task creates a tag with the core version`() {
+        val git = generateGradleProject()
+        git.tag().setName("v1.2.3").call()
+        commitRandom(git, "fix: real bug fix")
+        executeGradleRun("tagWithCoreVersion")
+
+        val versionTag: RevTag
+        RevWalk(git.repository).use {
+            versionTag = it.parseTag(git.tagList().call().last().objectId)
+        }
+
+        Assertions.assertEquals("v1.2.4", versionTag.tagName)
+    }
+
+    @Test
     fun `tagWithVersionWithoutBuildMetadata task creates a tag without build metadata`() {
         val git = generateGradleProject()
         git.tag().setName("v1.2.3").call()
