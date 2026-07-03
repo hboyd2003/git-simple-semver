@@ -21,6 +21,8 @@ package dev.hboyd.git_simple_semver
 import dev.hboyd.git_simple_semver.git_semver.BumpType
 import dev.hboyd.git_simple_semver.semver.SemanticVersion
 import org.eclipse.jgit.api.Git
+import org.eclipse.jgit.revwalk.RevTag
+import org.eclipse.jgit.revwalk.RevWalk
 import org.gradle.testkit.runner.BuildResult
 import org.gradle.testkit.runner.GradleRunner
 import org.junit.jupiter.api.Assertions
@@ -47,6 +49,7 @@ class GitSimpleSemverExtensionTest {
         import dev.hboyd.git_simple_semver.git_semver.dateTimeProvider
         import dev.hboyd.git_simple_semver.git_semver.textProvider
         import dev.hboyd.git_simple_semver.git_semver.BumpType
+        import dev.hboyd.git_simple_semver.git_semver.TagMessageProvider
         import dev.hboyd.git_simple_semver.LazyVersion
         import java.io.ByteArrayOutputStream
         import java.io.ByteArrayInputStream
@@ -253,6 +256,24 @@ class GitSimpleSemverExtensionTest {
         git.tag().setName("v1.0.0").call()
         commitRandom(git, "fix: real bug fix")
         executeGradleRun("printVersion").assertPrintedVersion("1.0.1-SNAPSHOT+buildIdentifier", "publicationVersion")
+    }
+
+    @Test
+    fun `version tag message provider is used to create message in version tags`() {
+        val git = generateGradleProject(
+            $$"""
+            |    versionTagMessageProvider = TagMessageProvider { "my version tag message $it" }
+            """.trimMargin()
+        )
+        executeGradleRun("tagWithCoreVersion")
+
+        val versionTag: RevTag
+        RevWalk(git.repository).use {
+            versionTag = it.parseTag(git.tagList().call().first().objectId)
+        }
+
+        Assertions.assertEquals("v0.0.0", versionTag.tagName)
+        Assertions.assertEquals("my version tag message 0.0.0", versionTag.fullMessage)
     }
 
     @Test

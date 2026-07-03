@@ -97,7 +97,8 @@ abstract class GitSimpleSemver : Plugin<Project> {
             TagTask::class.java,
             { extension.versionTagPrefix.get() + extension.coreVersion },
             { extension.versionTagPrefix.get() + extension.coreVersion },
-            "Creates a new annotated tag with the current core version with the configured prefix",
+            { extension.versionTagMessageProvider.get().getTagMessage(extension.coreVersion) },
+            "Creates an annotated Git tag using the version (excluding the build metadata), applying the configured prefix and message from the versionTagMessageProvider",
             "versioning"
         )
     }

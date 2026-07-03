@@ -105,6 +105,12 @@ abstract class GitSimpleSemverExtension @Inject constructor(
         .convention("v")
 
     /**
+     * The provider used to generate the tag message for the `tagWithCoreVersion` task.
+     */
+    val versionTagMessageProvider: Property<TagMessageProvider> =
+        objects.property(TagMessageProvider::class.java).convention(TagMessageProvider { "v${it}" })
+
+    /**
      * Providers to use for generating pre-release identifiers.
      */
     val preReleaseIdentifierProviders: ListProperty<SemanticVersionIdentifierProvider> =
