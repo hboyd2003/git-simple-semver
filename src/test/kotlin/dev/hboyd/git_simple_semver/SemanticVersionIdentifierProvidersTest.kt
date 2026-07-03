@@ -81,12 +81,12 @@ class SemanticVersionIdentifierProvidersTest {
     }
 
     @Test
-    fun `branch provider returns branch`() {
+    fun `branch provider returns sanitized branch`() {
         val identity = branchProvider().getIdentity(
-            context(branch = "feature/test-branch")
+            context(branch = "release/v2.0")
         )
 
-        assertEquals("feature/test-branch", identity)
+        assertEquals("release-v20", identity)
     }
 
     @Test

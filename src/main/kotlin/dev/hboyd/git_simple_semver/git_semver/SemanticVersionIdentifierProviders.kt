@@ -57,9 +57,22 @@ fun commitsSinceReleaseProvider() = SemanticVersionIdentifierProvider { ctx ->
 }
 
 /**
- * Creates a [SemanticVersionIdentifierProvider] that returns the current branch name.
+ * Creates a [SemanticVersionIdentifierProvider] that returns the current branch name as a valid semantic version
+ * identifier.
+ * 
+ * The branch name is sanitized by:
+ * 1. Replacing forward slashes (`/`) with dashes (`-`)
+ * 2. Removing any characters that do not match the pattern (`[A-Za-z0-9\-]`)
+ * 
+ * **Examples**
+ * - `feature/user-login` -> `feature-user-login`
+ * - `release/v2.0` -> `release-v20`
+ *
+ * @see [IDENTIFIER_REGEX]
  */
-fun branchProvider() = SemanticVersionIdentifierProvider(IdentifierProviderContext::branch)
+fun branchProvider() = SemanticVersionIdentifierProvider {
+    it.branch.replace('/', '-').replace("[^A-Za-z0-9\\-]".toRegex(), "")
+}
 
 /**
  * Creates a [SemanticVersionIdentifierProvider] that returns the current commit hash.
