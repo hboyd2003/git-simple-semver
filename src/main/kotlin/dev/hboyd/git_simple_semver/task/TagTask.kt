@@ -38,14 +38,14 @@ abstract class TagTask @Inject constructor(
 
     @TaskAction
     fun tag() {
-        Git.open(project.projectDir).use {
-            it.tag()
+        Git.open(project.projectDir).use { git ->
+            git.tag()
             .setAnnotated(true)
             .setName(nameSupplier.invoke())
             .setMessage(messageSupplier.invoke())
             .call()
-            .also {
-                logger.info("Tagged ${it.peeledObjectId} with name ${it.name}")
+            .also {ref ->
+                logger.info("Tagged ${ref.peeledObjectId} with name ${ref.name}")
             }
         }
     }
