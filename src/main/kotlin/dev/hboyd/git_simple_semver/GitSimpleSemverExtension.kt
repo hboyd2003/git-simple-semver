@@ -99,7 +99,8 @@ abstract class GitSimpleSemverExtension @Inject constructor(
         .convention("^(?:FIXUP|AMEND|MERGE|Merge).*")
 
     /**
-     * The prefix given to version tags.
+     * The prefix to prepend to version tags when creating them and when searching for existing version tags in the Git
+     * repository.
      */
     val versionTagPrefix: Property<String> = objects.property(String::class.java)
         .convention("v")
