@@ -45,7 +45,7 @@ abstract class TagTask @Inject constructor(
             .setMessage(messageSupplier.invoke())
             .call()
             .also {ref ->
-                logger.info("Tagged ${ref.peeledObjectId} with name ${ref.name}")
+                logger.lifecycle("Tagged ${ref.peeledObjectId} with name ${ref.name}")
             }
         }
     }
