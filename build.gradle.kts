@@ -38,7 +38,9 @@ indra {
         pom {
             developers {
                 developer {
-                    id = "hboyd"
+                    id.set("hboyd2003")
+                    name.set("Harrison Boyd")
+                    email.set("8950185+hboyd2003@users.noreply.github.com")
                     timezone = "America/New_York"
                 }
             }
