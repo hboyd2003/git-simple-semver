@@ -73,4 +73,12 @@ fun interface SemanticVersionIdentifierProvider {
     fun onlyIfBranch(branchRegex: Regex): SemanticVersionIdentifierProvider = SemanticVersionIdentifierProvider { ctx ->
         ctx.branch.let { if (it.matches(branchRegex)) this.getIdentity(ctx) else null }
     }
+
+    /**
+     * Returns a new [SemanticVersionIdentifierProvider] that only provides this provider if the current branch does not
+     * match the given [branchRegex].
+     */
+    fun onlyIfNotBranch(branchRegex: Regex): SemanticVersionIdentifierProvider = SemanticVersionIdentifierProvider { ctx ->
+        ctx.branch.let { if (!it.matches(branchRegex)) this.getIdentity(ctx) else null }
+    }
 }
