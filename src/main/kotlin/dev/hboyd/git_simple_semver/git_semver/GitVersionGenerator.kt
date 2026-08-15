@@ -40,13 +40,42 @@ class GitVersionGenerator(
     val minorChangeMatchers: List<ConventionalCommitMatcher>,
     val patchChangeMatchers: List<ConventionalCommitMatcher>,
     @Deprecated(message = "Not useful as it can only function for 0.1.0", level = DeprecationLevel.WARNING) val considerMajorChangesAsMinorWhenNoRelease: Boolean,
+    val considerMajorChangesAsMinorWhenMajorZero: Boolean,
     val ignoredCommitRegex: Regex,
     val versionTagPrefix: String,
     val preReleaseIdentifierProviders: List<SemanticVersionIdentifierProvider>,
     val buildIdentifierProviders: List<SemanticVersionIdentifierProvider>,
-    val minimumVersionBump: BumpType = BumpType.NONE,
-    val considerMajorChangesAsMinorWhenMajorZero: Boolean = false
+    val minimumVersionBump: BumpType = BumpType.NONE
 ) {
+    @Deprecated(
+        message = "For compatibility, has confusing ordering, for removal",
+        level = DeprecationLevel.WARNING
+    )
+    constructor(
+        majorChangeMatchers: List<ConventionalCommitMatcher>,
+        minorChangeMatchers: List<ConventionalCommitMatcher>,
+        patchChangeMatchers: List<ConventionalCommitMatcher>,
+        considerMajorChangesAsMinorWhenNoRelease: Boolean,
+        ignoredCommitRegex: Regex,
+        versionTagPrefix: String,
+        preReleaseIdentifierProviders: List<SemanticVersionIdentifierProvider>,
+        buildIdentifierProviders: List<SemanticVersionIdentifierProvider>,
+        minimumVersionBump: BumpType = BumpType.NONE,
+        considerMajorChangesAsMinorWhenMajorZero: Boolean = false
+    ) : this(
+        majorChangeMatchers,
+        minorChangeMatchers,
+        patchChangeMatchers,
+        considerMajorChangesAsMinorWhenNoRelease,
+        considerMajorChangesAsMinorWhenMajorZero,
+        ignoredCommitRegex,
+        versionTagPrefix,
+        preReleaseIdentifierProviders,
+        buildIdentifierProviders,
+        minimumVersionBump
+    )
+
+
     /**
      * Generates a version for the given [repositoryDir].
      */

@@ -148,12 +148,12 @@ abstract class GitSimpleSemverExtension @Inject constructor(
             minorChangeSelections.get().map { it.asConventionCommitMatcher() },
             patchChangeSelections.get().map { it.asConventionCommitMatcher() },
             considerMajorChangesAsMinorWhenNoRelease.get(),
+            considerMajorChangesAsMinorWhenMajorVersionZero.get(),
             ignoredCommitRegex.get().toRegex(),
             versionTagPrefix.get(),
             preReleaseIdentifierProviders.get(),
             buildIdentifierProviders.get(),
             minimumVersionBump.get(),
-            considerMajorChangesAsMinorWhenMajorVersionZero.get()
         )
     }
 
