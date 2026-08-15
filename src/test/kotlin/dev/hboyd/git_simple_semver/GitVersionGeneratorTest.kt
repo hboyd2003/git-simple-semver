@@ -228,6 +228,76 @@ class GitVersionGeneratorTest {
     }
 
     @Test
+    fun `generated version bumps version as major for breaking change when major version 0 and major changes are not considered minor when major version 0`() {
+        val git: Git = setupGitRepo(testProjectDir)
+        git.tag().setName("v0.1.0").call()
+        commitRandom(git, "feat!: breaking feature")
+
+        val version = GitVersionGenerator(
+            listOf(),
+            listOf(ConventionalCommitMatcher("feat")),
+            listOf(ConventionalCommitMatcher("fix")),
+            false,
+            "".toRegex(),
+            "v",
+            listOf(),
+            listOf(),
+            BumpType.MAJOR,
+            considerMajorChangesAsMinorWhenMajorZero = false
+        ).generateVersion(git.repository)
+
+
+        Assertions.assertEquals("1.0.0", version.toString())
+    }
+
+    @Test
+    fun `generated version bumps version as minor for breaking change when major version 0 and major changes are considered minor when major version 0`() {
+        val git: Git = setupGitRepo(testProjectDir)
+        git.tag().setName("v0.1.0").call()
+        commitRandom(git, "feat!: breaking feature")
+
+        val version = GitVersionGenerator(
+            listOf(),
+            listOf(ConventionalCommitMatcher("feat")),
+            listOf(ConventionalCommitMatcher("fix")),
+            false,
+            "".toRegex(),
+            "v",
+            listOf(),
+            listOf(),
+            BumpType.MAJOR,
+            considerMajorChangesAsMinorWhenMajorZero = true
+        ).generateVersion(git.repository)
+
+        Assertions.assertEquals("0.2.0", version.toString())
+    }
+
+    @Test
+    fun `generated version bumps version as major for breaking change when major version not 0 and major changes are considered minor when major version 0`() {
+        val git: Git = setupGitRepo(testProjectDir)
+        git.tag().setName("v1.0.0").call()
+        commitRandom(git, "feat!: breaking feature")
+
+        val version = GitVersionGenerator(
+            listOf(),
+            listOf(ConventionalCommitMatcher("feat")),
+            listOf(ConventionalCommitMatcher("fix")),
+            false,
+            "".toRegex(),
+            "v",
+            listOf(),
+            listOf(),
+            BumpType.MAJOR,
+            considerMajorChangesAsMinorWhenMajorZero = true
+            ).generateVersion(git.repository)
+
+
+        Assertions.assertEquals("2.0.0", version.toString())
+    }
+
+
+
+    @Test
     fun `context ignores commits on other branches`() {
         val git: Git = setupGitRepo(testProjectDir)
         commitRandom(git, "fix: fix bug")
@@ -287,6 +357,4 @@ class GitVersionGeneratorTest {
         Assertions.assertEquals(3, context.versionTags.size)
         Assertions.assertEquals(listOf("v1.1.0", "v2.1.0", "v1.0.0"), context.versionTags.map { it.toString() })
     }
-
-
 }

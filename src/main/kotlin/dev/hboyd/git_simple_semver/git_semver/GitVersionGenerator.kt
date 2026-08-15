@@ -45,6 +45,7 @@ class GitVersionGenerator(
     val preReleaseIdentifierProviders: List<SemanticVersionIdentifierProvider>,
     val buildIdentifierProviders: List<SemanticVersionIdentifierProvider>,
     val minimumVersionBump: BumpType = BumpType.NONE,
+    val considerMajorChangesAsMinorWhenMajorZero: Boolean = false
 ) {
     /**
      * Generates a version for the given [repositoryDir].
@@ -102,8 +103,13 @@ class GitVersionGenerator(
             if (bump == BumpType.NONE && it > 0) bump = minimumVersionBump
         }
 
-        if (bump == BumpType.MAJOR && considerMajorChangesAsMinorWhenNoRelease && lastReleaseTag == null)
+        if (bump == BumpType.MAJOR &&
+            ((considerMajorChangesAsMinorWhenNoRelease && lastReleaseTag == null)
+                    || (considerMajorChangesAsMinorWhenMajorZero && lastReleaseTag.let { lastReleaseTag?.major == 0 }))
+        ) {
             bump = BumpType.MINOR
+        }
+
         val currentVersion: SemanticVersion = currentReleaseVersion.bump(bump)
 
         val identifierProviderContext =

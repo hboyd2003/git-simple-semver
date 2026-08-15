@@ -93,6 +93,12 @@ abstract class GitSimpleSemverExtension @Inject constructor(
         .convention(true)
 
     /**
+     * If true, major changes will be considered minor changes when the major version is 0.
+     */
+    val considerMajorChangesAsMinorWhenMajorVersionZero: Property<Boolean> = objects.property(Boolean::class.java)
+        .convention(true)
+
+    /**
      * Commits that will be ignored when calculating the version.
      */
     val ignoredCommitRegex: Property<String> = objects.property(String::class.java)
@@ -145,7 +151,8 @@ abstract class GitSimpleSemverExtension @Inject constructor(
             versionTagPrefix.get(),
             preReleaseIdentifierProviders.get(),
             buildIdentifierProviders.get(),
-            minimumVersionBump.get()
+            minimumVersionBump.get(),
+            considerMajorChangesAsMinorWhenMajorVersionZero.get()
         )
     }
 
