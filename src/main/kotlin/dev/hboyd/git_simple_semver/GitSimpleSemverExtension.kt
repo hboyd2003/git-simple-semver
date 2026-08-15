@@ -89,6 +89,7 @@ abstract class GitSimpleSemverExtension @Inject constructor(
     /**
      * If true, major changes will be considered minor changes when no release has been made yet.
      */
+    @Deprecated(message = "Not useful as it can only function for 0.1.0", level = DeprecationLevel.WARNING)
     val considerMajorChangesAsMinorWhenNoRelease: Property<Boolean> = objects.property(Boolean::class.java)
         .convention(true)
 

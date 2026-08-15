@@ -39,7 +39,7 @@ class GitVersionGenerator(
     val majorChangeMatchers: List<ConventionalCommitMatcher>,
     val minorChangeMatchers: List<ConventionalCommitMatcher>,
     val patchChangeMatchers: List<ConventionalCommitMatcher>,
-    val considerMajorChangesAsMinorWhenNoRelease: Boolean,
+    @Deprecated(message = "Not useful as it can only function for 0.1.0", level = DeprecationLevel.WARNING) val considerMajorChangesAsMinorWhenNoRelease: Boolean,
     val ignoredCommitRegex: Regex,
     val versionTagPrefix: String,
     val preReleaseIdentifierProviders: List<SemanticVersionIdentifierProvider>,
