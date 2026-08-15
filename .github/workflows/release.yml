@@ -16,6 +16,5 @@ jobs:
     permissions:
       contents: "write"
     with:
-      is_gradle_plugin: true
       tag_name: "${{ startsWith(github.ref, 'refs/tags/v') && github.ref || 'snapshot' }}"
     secrets: "inherit"
