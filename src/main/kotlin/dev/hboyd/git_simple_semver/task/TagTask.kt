@@ -29,7 +29,7 @@ abstract class TagTask @Inject constructor(
     private val nameSupplier: () -> String,
     private val messageSupplier: () -> String,
     description: String?,
-    group: String? = "Other",
+    group: String? = "other",
 ) : DefaultTask() {
     init {
         this.group = group
