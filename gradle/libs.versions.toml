@@ -3,7 +3,7 @@ kotlin = "2.4.10"
 pluginPublish = "2.1.0"
 jgit = "7.7.1.+"
 indra = "4.2.0-SNAPSHOT"
-gitSimpleSemver = "2.3.0"
+gitSimpleSemver = "2.4.0-SNAPSHOT"
 
 # Testing
 junit = "6.1.3"
