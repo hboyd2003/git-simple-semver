@@ -20,6 +20,10 @@ package dev.hboyd.git_simple_semver
 
 import dev.hboyd.git_simple_semver.conventional_commit.ConventionalCommit
 import dev.hboyd.git_simple_semver.conventional_commit.toConventionalCommit
+import dev.hboyd.git_simple_semver.git_semver.BumpType
+import dev.hboyd.git_simple_semver.git_semver.IdentifierProviderContext
+import dev.hboyd.git_simple_semver.semver.SemanticVersion
+import dev.hboyd.git_simple_semver.semver.SemanticVersionTag
 import org.eclipse.jgit.api.Git
 import java.io.File
 import java.util.*
@@ -47,4 +51,26 @@ fun commitRandom(git: Git, commitMessage: String): ConventionalCommit {
     randomFile.writeText("Content")
     git.add().addFilepattern(randomFile.toString()).call()
     return git.commit().setMessage(commitMessage).call().toConventionalCommit()
+}
+
+fun buildIdentifierProviderContext(
+    version: SemanticVersion = SemanticVersion(1, 2, 3),
+    bumpType: BumpType = BumpType.MINOR,
+    dirty: Boolean = false,
+    branch: String = "main",
+    commits: List<ConventionalCommit> = listOf(),
+    versionTags: List<SemanticVersionTag> = listOf(),
+    commitsSinceLastVersionTag: Int? = 1,
+    commitsSinceLastReleaseVersionTag: Int? = 1
+): IdentifierProviderContext {
+    return IdentifierProviderContext(
+        version,
+        bumpType,
+        dirty,
+        branch,
+        commits,
+        versionTags,
+        commitsSinceLastVersionTag,
+        commitsSinceLastReleaseVersionTag
+    )
 }

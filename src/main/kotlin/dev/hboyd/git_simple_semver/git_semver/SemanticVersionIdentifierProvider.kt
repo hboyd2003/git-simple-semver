@@ -81,4 +81,15 @@ fun interface SemanticVersionIdentifierProvider {
     fun onlyIfNotBranch(branchRegex: Regex): SemanticVersionIdentifierProvider = SemanticVersionIdentifierProvider { ctx ->
         ctx.branch.let { if (!it.matches(branchRegex)) this.getIdentity(ctx) else null }
     }
+
+    /**
+     * Returns a new [SemanticVersionIdentifierProvider] that only provides this provider if current commit is not
+     * a tagged release version or the repo is dirty.
+     */
+    fun onlyIfNotRelease(): SemanticVersionIdentifierProvider = SemanticVersionIdentifierProvider { ctx ->
+        if (ctx.commitsSinceLastReleaseVersionTag != 0
+            || ctx.dirty
+        ) this.getIdentity(ctx)
+        else null
+    }
 }

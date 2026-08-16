@@ -18,15 +18,7 @@
 
 package dev.hboyd.git_simple_semver
 
-import dev.hboyd.git_simple_semver.conventional_commit.ConventionalCommit
-import dev.hboyd.git_simple_semver.git_semver.BumpType
-import dev.hboyd.git_simple_semver.git_semver.IdentifierProviderContext
-import dev.hboyd.git_simple_semver.git_semver.branchProvider
-import dev.hboyd.git_simple_semver.git_semver.commitsSinceReleaseProvider
-import dev.hboyd.git_simple_semver.git_semver.currentCommitHashProvider
-import dev.hboyd.git_simple_semver.git_semver.dateTimeProvider
-import dev.hboyd.git_simple_semver.git_semver.textProvider
-import dev.hboyd.git_simple_semver.semver.SemanticVersion
+import dev.hboyd.git_simple_semver.git_semver.*
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.io.CleanupMode
@@ -40,7 +32,7 @@ class SemanticVersionIdentifierProvidersTest {
 
     @Test
     fun `date provider returns date time`() {
-        val identity = dateTimeProvider().getIdentity(context())
+        val identity = dateTimeProvider().getIdentity(buildIdentifierProviderContext())
 
         assertNotNull(identity)
         assertDoesNotThrow { DateTimeFormatter.ofPattern("yyyyMMddHHmmss").parse(identity) }
@@ -49,7 +41,7 @@ class SemanticVersionIdentifierProvidersTest {
     @Test
     fun `date provider returns custom date time`() {
         val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm-ss")
-        val identity = dateTimeProvider(formatter).getIdentity(context())
+        val identity = dateTimeProvider(formatter).getIdentity(buildIdentifierProviderContext())
 
         assertNotNull(identity)
         assertDoesNotThrow { formatter.parse(identity) }
@@ -57,7 +49,7 @@ class SemanticVersionIdentifierProvidersTest {
 
     @Test
     fun `text provider returns text`() {
-        val identity = textProvider("SNAPSHOT").getIdentity(context())
+        val identity = textProvider("SNAPSHOT").getIdentity(buildIdentifierProviderContext())
 
         assertEquals("SNAPSHOT", identity)
     }
@@ -65,7 +57,7 @@ class SemanticVersionIdentifierProvidersTest {
     @Test
     fun `commits since release provider returns commits since last version tag`() {
         val identity = commitsSinceReleaseProvider().getIdentity(
-            context(commitsSinceLastVersionTag = 2)
+            buildIdentifierProviderContext(commitsSinceLastVersionTag = 2)
         )
 
         assertEquals("2", identity)
@@ -74,7 +66,7 @@ class SemanticVersionIdentifierProvidersTest {
     @Test
     fun `commits since release provider returns null when commits since last version tag is unknown`() {
         val identity = commitsSinceReleaseProvider().getIdentity(
-            context(commitsSinceLastVersionTag = null)
+            buildIdentifierProviderContext(commitsSinceLastVersionTag = null)
         )
 
         assertNull(identity)
@@ -83,7 +75,7 @@ class SemanticVersionIdentifierProvidersTest {
     @Test
     fun `branch provider returns sanitized branch`() {
         val identity = branchProvider().getIdentity(
-            context(branch = "release/v2.0")
+            buildIdentifierProviderContext(branch = "release/v2.0")
         )
 
         assertEquals("release-v20", identity)
@@ -94,7 +86,7 @@ class SemanticVersionIdentifierProvidersTest {
         val git = setupGitRepo(testProjectDir)
         val commit = commitRandom(git, "fix: fix bug")
         val identity = currentCommitHashProvider(shortHash = false).getIdentity(
-            context(commits = listOf(commit))
+            buildIdentifierProviderContext(commits = listOf(commit))
         )
 
         assertEquals(commit.commit.name, identity)
@@ -103,7 +95,7 @@ class SemanticVersionIdentifierProvidersTest {
     @Test
     fun `current commit hash provider returns null when there are no commits`() {
         val identity = currentCommitHashProvider().getIdentity(
-            context(commits = listOf())
+            buildIdentifierProviderContext(commits = listOf())
         )
 
         assertNull(identity)
@@ -114,7 +106,7 @@ class SemanticVersionIdentifierProvidersTest {
         val git = setupGitRepo(testProjectDir)
         val commit = commitRandom(git, "fix: fix bug")
         val identity = currentCommitHashProvider().getIdentity(
-            context(commits = listOf(commit))
+            buildIdentifierProviderContext(commits = listOf(commit))
         )
 
         assertEquals(commit.commit.name.substring(0, 7), identity)
@@ -123,25 +115,9 @@ class SemanticVersionIdentifierProvidersTest {
     @Test
     fun `current commit short hash provider returns null when there are no commits`() {
         val identity = currentCommitHashProvider().getIdentity(
-            context(commits = listOf())
+            buildIdentifierProviderContext(commits = listOf())
         )
 
         assertNull(identity)
     }
-
-    private fun context(
-        commits: List<ConventionalCommit> = listOf(),
-        branch: String = "main",
-        commitsSinceLastVersionTag: Int? = null,
-        commitsSinceLastReleaseVersionTag: Int? = null,
-    ) = IdentifierProviderContext(
-        SemanticVersion(1, 2, 3),
-        BumpType.NONE,
-        false,
-        branch,
-        commits,
-        listOf(),
-        commitsSinceLastVersionTag,
-        commitsSinceLastReleaseVersionTag
-    )
 }
