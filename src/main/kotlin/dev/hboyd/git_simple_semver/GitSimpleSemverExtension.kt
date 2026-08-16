@@ -126,7 +126,7 @@ abstract class GitSimpleSemverExtension @Inject constructor(
         objects.listProperty(SemanticVersionIdentifierProvider::class.java)
             .convention(listOf(
                 textProvider("SNAPSHOT").onlyIfChanges(),
-                branchProvider().onlyIfNotBranch("^(main|master|trunk|release.*)$".toRegex()),
+                branchProvider().onlyIfNotRelease().onlyIfNotBranch("^(main|master|trunk|release.*)$".toRegex()),
             ))
 
     /**
