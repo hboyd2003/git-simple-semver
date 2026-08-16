@@ -16,9 +16,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package dev.hboyd.git_simple_semver
+package dev.hboyd.git_simple_semver.git_semver
 
-import dev.hboyd.git_simple_semver.git_semver.*
+import dev.hboyd.git_simple_semver.buildIdentifierProviderContext
+import dev.hboyd.git_simple_semver.commitRandom
+import dev.hboyd.git_simple_semver.setupGitRepo
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.io.CleanupMode
