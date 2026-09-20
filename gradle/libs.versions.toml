@@ -1,6 +1,6 @@
 [versions]
 kotlin = "2.4.20"
-pluginPublish = "2.1.0"
+pluginPublish = "2.2.1"
 jgit = "7.7.1.+"
 indra = "4.2.0-SNAPSHOT"
 gitSimpleSemver = "2.4.0-SNAPSHOT"
