@@ -5,7 +5,7 @@
 *.scala                                    text diff=java
 *.gradle                                   text diff=java
 *.gradle.kts                               text diff=kotlin
-src/java/resources/META-INF/services/**    text
+src/**/resources/META-INF/services/**      text
 
 # Text files
 *.txt             text
