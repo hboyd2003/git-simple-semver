@@ -28,12 +28,14 @@ import org.gradle.api.file.ProjectLayout
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
+import org.gradle.api.provider.ProviderFactory
 import org.gradle.api.tasks.Nested
 import javax.inject.Inject
 
 abstract class GitSimpleSemverExtension @Inject constructor(
     private val layout: ProjectLayout,
-    private val objects: ObjectFactory
+    private val objects: ObjectFactory,
+    providerFactory: ProviderFactory
 ) {
     /**
      * The selectors for the types of changes that will trigger a major version bump.
@@ -100,10 +102,27 @@ abstract class GitSimpleSemverExtension @Inject constructor(
         .convention(true)
 
     /**
-     * Commits that will be ignored when calculating the version.
+     * Commits that will be excluded when calculating the version.
      */
+    val excludedCommitRegex: Property<Regex> = objects.property(Regex::class.java)
+        .convention(providerFactory.provider {
+            if (ignoredCommitRegex.isPresent)
+                return@provider ignoredCommitRegex.get().toRegex()
+
+            return@provider "^(?:FIXUP|AMEND|MERGE|Merge).*".toRegex()
+        })
+
+    /**
+     * Commits that will be ignored when calculating the version.
+     *
+     * Setting this value will override [excludedCommitRegex]
+     */
+    @Deprecated(
+        message = "Lacks ability to set regex options",
+        replaceWith = ReplaceWith("excludedCommitRegex"),
+        level = DeprecationLevel.WARNING
+    )
     val ignoredCommitRegex: Property<String> = objects.property(String::class.java)
-        .convention("^(?:FIXUP|AMEND|MERGE|Merge).*")
 
     /**
      * The prefix to prepend to version tags when creating them and when searching for existing version tags in the Git
@@ -149,7 +168,7 @@ abstract class GitSimpleSemverExtension @Inject constructor(
             patchChangeSelections.get().map { it.asConventionCommitMatcher() },
             considerMajorChangesAsMinorWhenNoRelease.get(),
             considerMajorChangesAsMinorWhenMajorVersionZero.get(),
-            ignoredCommitRegex.get().toRegex(),
+            excludedCommitRegex.get(),
             versionTagPrefix.get(),
             preReleaseIdentifierProviders.get(),
             buildIdentifierProviders.get(),
@@ -177,7 +196,7 @@ abstract class GitSimpleSemverExtension @Inject constructor(
         GitVersionGenerator.createVersionProviderContext(
             repository,
             versionTagPrefix.get(),
-            ignoredCommitRegex.get().toRegex()
+            excludedCommitRegex.get()
         )
     }
 
@@ -206,6 +225,7 @@ abstract class GitSimpleSemverExtension @Inject constructor(
         val typeScopeSelectionSpec: TypeScopeSelectionSpec = objects.newInstance(TypeScopeSelectionSpec::class.java)
         typeScopeSelectionSpec.typeRegex.set(typeRegex)
         typeScopeSelectionSpec.scopeRegex.set(scopeRegex)
+
         return typeScopeSelectionSpec
     }
 }
