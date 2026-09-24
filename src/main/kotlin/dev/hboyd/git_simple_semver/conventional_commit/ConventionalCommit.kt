@@ -56,7 +56,14 @@ class ConventionalCommit(
      * Whether the commit is a breaking change.
      */
     val breakingChange: Boolean
-        get() = conventionalCommitShortMessageValues()[3].isNotEmpty() || commit.footerLines.any { it.key == "BREAKING CHANGE" }
+        get() {
+            if (conventionalCommitShortMessageValues()[3].isNotEmpty())  // '!' exists
+                return true
+
+            val commitMessageLines = commit.fullMessage.lines()
+            return commitMessageLines.size > 2
+                    && commitMessageLines.subList(2, commitMessageLines.size).any { it.startsWith("BREAKING CHANGE:") }
+        }
 
     /**
      * The description of the commit.

@@ -188,6 +188,34 @@ class GitVersionGeneratorTest {
         Assertions.assertEquals("2.0.0", version.toString())
     }
 
+    @Test
+    fun `generated version bumps major version once when breaking change footer exists`() {
+        val git: Git = setupGitRepo(testProjectDir)
+        val initialVersion = SemanticVersion(1, 0, 0)
+        git.tag().setName("v$initialVersion").call()
+        commitRandom(git, "fix: fix bug")
+        commitRandom(git, """
+            feat: a new feature
+            
+            another-footer: a footer
+            BREAKING CHANGE: a breaking change!
+            last-footer: the last footer""".trimIndent())
+
+        val version = GitVersionGenerator(
+            listOf(),
+            listOf(ConventionalCommitMatcher("feat")),
+            listOf(ConventionalCommitMatcher("fix")),
+            considerMajorChangesAsMinorWhenNoRelease = true,
+            considerMajorChangesAsMinorWhenMajorZero = false,
+            "".toRegex(),
+            "v",
+            listOf(),
+            listOf()
+        ).generateVersion(git.repository)
+
+        Assertions.assertEquals("2.0.0", version.toString())
+    }
+
     @ParameterizedTest
     @EnumSource(value = BumpType::class)
     fun `generated version bumps with minimum bump when commits after release exist but non match any bump`(bumpType: BumpType) {
@@ -303,8 +331,6 @@ class GitVersionGeneratorTest {
 
         Assertions.assertEquals("2.0.0", version.toString())
     }
-
-
 
     @Test
     fun `context ignores commits on other branches`() {
