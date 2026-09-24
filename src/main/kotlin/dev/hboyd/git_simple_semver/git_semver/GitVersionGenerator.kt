@@ -134,7 +134,7 @@ class GitVersionGenerator(
 
         if (bump == BumpType.MAJOR &&
             ((considerMajorChangesAsMinorWhenNoRelease && lastReleaseTag == null)
-                    || (considerMajorChangesAsMinorWhenMajorZero && lastReleaseTag.let { lastReleaseTag?.major == 0 }))
+                    || (considerMajorChangesAsMinorWhenMajorZero && currentReleaseVersion.major == 0))
         ) {
             bump = BumpType.MINOR
         }

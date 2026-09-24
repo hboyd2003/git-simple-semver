@@ -145,7 +145,6 @@ class GitVersionGeneratorTest {
         commitRandom(git, "fix: fix bug")
         commitRandom(git, "feat: new feature")
         commitRandom(git, "fix: fix another bug")
-        commitRandom(git, "feat: add feature")
 
         val version = GitVersionGenerator(
             listOf(),
@@ -307,6 +306,27 @@ class GitVersionGeneratorTest {
         ).generateVersion(git.repository)
 
         Assertions.assertEquals("0.2.0", version.toString())
+    }
+
+    @Test
+    fun `generated version bumps version as minor for breaking change when no release and major changes are considered minor when major version 0`() {
+        val git: Git = setupGitRepo(testProjectDir)
+        commitRandom(git, "feat!: breaking feature")
+
+        val version = GitVersionGenerator(
+            listOf(),
+            listOf(ConventionalCommitMatcher("feat")),
+            listOf(ConventionalCommitMatcher("fix")),
+            considerMajorChangesAsMinorWhenNoRelease = false,
+            considerMajorChangesAsMinorWhenMajorZero = true,
+            "".toRegex(),
+            "v",
+            listOf(),
+            listOf(),
+            BumpType.MAJOR
+        ).generateVersion(git.repository)
+
+        Assertions.assertEquals("0.1.0", version.toString())
     }
 
     @Test
