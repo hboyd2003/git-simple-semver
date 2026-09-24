@@ -109,7 +109,7 @@ abstract class GitSimpleSemverExtension @Inject constructor(
             if (ignoredCommitRegex.isPresent)
                 return@provider ignoredCommitRegex.get().toRegex()
 
-            return@provider "^(?:FIXUP|AMEND|MERGE|Merge).*".toRegex()
+            return@provider "^(?:fixup|amend|merge).*".toRegex(RegexOption.IGNORE_CASE)
         })
 
     /**
