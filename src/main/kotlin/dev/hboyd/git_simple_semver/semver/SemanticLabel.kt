@@ -36,7 +36,7 @@ sealed class SemanticLabel(val prefix: String) : ArrayList<String>() {
         /**
          * A regex that matches a semantic label identifier.
          */
-        val IDENTIFIER_REGEX: Regex = Regex("^[A-z0-9\\-]+$")
+        val IDENTIFIER_REGEX: Regex = Regex("^[\\-0-9A-Za-z]+$")
     }
 
     init {
