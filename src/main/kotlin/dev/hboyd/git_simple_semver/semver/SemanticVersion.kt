@@ -39,7 +39,7 @@ open class SemanticVersion(
          * With groups for major, minor, patch, pre-release label, and build metadata label.
          */
         val SEMANTIC_VERSION_REGEX: Regex =
-            Regex("^(\\d+)\\.(\\d+)\\.(\\d+)(?:-?((?:[A-z0-9-]+\\.?)+))?(?:\\+((?:[A-z0-9-]+\\.?)+))?$")
+            Regex("^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-((?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\\.(?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\\+([0-9a-zA-Z-]+(?:\\.[0-9a-zA-Z-]+)*))?$")
 
         /**
          * Creates a new [SemanticVersion] with the same values as the given [version].
