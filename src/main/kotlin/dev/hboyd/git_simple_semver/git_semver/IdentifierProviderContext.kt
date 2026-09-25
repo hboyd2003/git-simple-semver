@@ -21,6 +21,8 @@ package dev.hboyd.git_simple_semver.git_semver
 import dev.hboyd.git_simple_semver.conventional_commit.ConventionalCommit
 import dev.hboyd.git_simple_semver.semver.SemanticVersion
 import dev.hboyd.git_simple_semver.semver.SemanticVersionTag
+import kotlin.time.Clock
+import kotlin.time.Instant
 
 /**
  * Context used by semantic version identifier providers to generate identifiers.
@@ -33,7 +35,8 @@ class IdentifierProviderContext(
     commits: List<ConventionalCommit>,
     versionTags: List<SemanticVersionTag>,
     commitsSinceLastVersionTag: Int?,
-    commitsSinceLastReleaseVersionTag: Int?
+    commitsSinceLastReleaseVersionTag: Int?,
+    buildTime: Instant = Clock.System.now()
 ) : VersionProviderContext(
     dirty,
     branch,
@@ -41,7 +44,8 @@ class IdentifierProviderContext(
     versionTags,
     commitsSinceLastVersionTag,
     commitsSinceLastReleaseVersionTag,
-    bumpType
+    bumpType,
+    buildTime
 ) {
     constructor(
         versionProviderContext: VersionProviderContext,
@@ -55,6 +59,7 @@ class IdentifierProviderContext(
         versionProviderContext.commits,
         versionProviderContext.versionTags,
         versionProviderContext.commitsSinceLastVersionTag,
-        versionProviderContext.commitsSinceLastReleaseVersionTag
+        versionProviderContext.commitsSinceLastReleaseVersionTag,
+        versionProviderContext.buildTime
     )
 }

@@ -19,22 +19,33 @@
 package dev.hboyd.git_simple_semver
 
 import dev.hboyd.git_simple_semver.conventional_commit.ConventionalCommitMatcher
-import dev.hboyd.git_simple_semver.git_semver.*
+import dev.hboyd.git_simple_semver.git_semver.BumpType
+import dev.hboyd.git_simple_semver.git_semver.GitVersionGenerator
+import dev.hboyd.git_simple_semver.git_semver.SemanticVersionIdentifierProvider
+import dev.hboyd.git_simple_semver.git_semver.TagMessageProvider
+import dev.hboyd.git_simple_semver.git_semver.VersionProviderContext
+import dev.hboyd.git_simple_semver.git_semver.branchProvider
+import dev.hboyd.git_simple_semver.git_semver.commitsSinceReleaseProvider
+import dev.hboyd.git_simple_semver.git_semver.dateTimeProvider
+import dev.hboyd.git_simple_semver.git_semver.textProvider
 import dev.hboyd.git_simple_semver.semver.SemanticVersion
 import org.eclipse.jgit.lib.Repository
 import org.eclipse.jgit.lib.RepositoryBuilder
 import org.eclipse.jgit.util.FS
 import org.gradle.api.file.ProjectLayout
+import org.gradle.api.invocation.BuildInvocationDetails
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.ProviderFactory
 import org.gradle.api.tasks.Nested
 import javax.inject.Inject
+import kotlin.time.Instant
 
 abstract class GitSimpleSemverExtension @Inject constructor(
     private val layout: ProjectLayout,
     private val objects: ObjectFactory,
+    private var buildInvocationDetails: BuildInvocationDetails,
     providerFactory: ProviderFactory
 ) {
     /**
@@ -173,6 +184,7 @@ abstract class GitSimpleSemverExtension @Inject constructor(
             preReleaseIdentifierProviders.get(),
             buildIdentifierProviders.get(),
             minimumVersionBump.get(),
+            Instant.fromEpochMilliseconds(buildInvocationDetails.buildStartedTime)
         )
     }
 

@@ -20,6 +20,8 @@ package dev.hboyd.git_simple_semver.git_semver
 
 import dev.hboyd.git_simple_semver.conventional_commit.ConventionalCommit
 import dev.hboyd.git_simple_semver.semver.SemanticVersionTag
+import kotlin.time.Clock
+import kotlin.time.Instant
 
 /**
  * Context used by the [GitVersionGenerator] to generate a version.
@@ -31,8 +33,11 @@ open class VersionProviderContext(
     val versionTags: List<SemanticVersionTag>,
     val commitsSinceLastVersionTag: Int?,
     val commitsSinceLastReleaseVersionTag: Int?,
-    val bump: BumpType = BumpType.NONE
+    val bump: BumpType = BumpType.NONE,
+    val buildTime: Instant = Clock.System.now()
 ) {
+
+
     override fun toString(): String {
         return """
             dirty=$dirty

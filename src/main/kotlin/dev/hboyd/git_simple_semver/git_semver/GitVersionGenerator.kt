@@ -32,6 +32,8 @@ import org.eclipse.jgit.revwalk.RevSort
 import org.eclipse.jgit.revwalk.RevWalk
 import org.eclipse.jgit.util.FS
 import java.io.File
+import kotlin.time.Clock
+import kotlin.time.Instant
 
 /**
  * Generates a semantic version based on the conventional commits in a git repository.
@@ -46,7 +48,8 @@ class GitVersionGenerator(
     val versionTagPrefix: String,
     val preReleaseIdentifierProviders: List<SemanticVersionIdentifierProvider>,
     val buildIdentifierProviders: List<SemanticVersionIdentifierProvider>,
-    val minimumVersionBump: BumpType = BumpType.NONE
+    val minimumVersionBump: BumpType = BumpType.NONE,
+    val buildTime: Instant = Clock.System.now()
 ) {
     @Deprecated(
         message = "For compatibility, has confusing ordering, for removal",
@@ -62,7 +65,7 @@ class GitVersionGenerator(
         preReleaseIdentifierProviders: List<SemanticVersionIdentifierProvider>,
         buildIdentifierProviders: List<SemanticVersionIdentifierProvider>,
         minimumVersionBump: BumpType = BumpType.NONE,
-        considerMajorChangesAsMinorWhenMajorZero: Boolean = false
+        considerMajorChangesAsMinorWhenMajorZero: Boolean = false,
     ) : this(
         majorChangeMatchers,
         minorChangeMatchers,
@@ -104,7 +107,8 @@ class GitVersionGenerator(
             if (repository != null) createVersionProviderContext(
                 repository,
                 versionTagPrefix,
-                ignoredCommitRegex
+                ignoredCommitRegex,
+                buildTime
             )
             else VersionProviderContext.EMPTY
     ): SemanticVersion {
@@ -167,7 +171,8 @@ class GitVersionGenerator(
         fun createVersionProviderContext(
             repository: Repository,
             versionTagPrefix: String = "v",
-            ignoredCommitRegex: Regex = "^FIXUP.*".toRegex()
+            ignoredCommitRegex: Regex = "^FIXUP.*".toRegex(),
+            buildTime: Instant = Clock.System.now()
         ): VersionProviderContext {
             check(!(repository.isBare)) { "Repository must be a non-bare repository" }
 
@@ -219,7 +224,8 @@ class GitVersionGenerator(
                 commits.values.mapNotNull { runCatching { it.toConventionalCommit() }.getOrNull() }.toList(),
                 versionTags,
                 commitsSinceLastVersionTag,
-                commitsSinceLastReleaseVersionTag
+                commitsSinceLastReleaseVersionTag,
+                buildTime = buildTime
             )
         }
     }
