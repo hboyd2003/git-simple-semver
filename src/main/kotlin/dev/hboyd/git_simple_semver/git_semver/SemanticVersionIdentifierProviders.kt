@@ -20,7 +20,9 @@ package dev.hboyd.git_simple_semver.git_semver
 
 import dev.hboyd.git_simple_semver.semver.SemanticLabel.Companion.IDENTIFIER_REGEX
 import java.time.Clock
+import java.time.ZoneId
 import java.time.format.DateTimeFormatter
+import kotlin.time.toJavaInstant
 
 /**
  * Creates a [SemanticVersionIdentifierProvider] that returns the current date and time in the specified [formatter].
@@ -33,6 +35,23 @@ fun dateTimeProvider(formatter: DateTimeFormatter = DateTimeFormatter.ofPattern(
             else formatter
 
         val formatedDate: String = formatterWithZone.format(Clock.systemUTC().instant())
+        require(formatedDate.matches(IDENTIFIER_REGEX)) {
+            "Invalid date formater. Output produced \"$formatedDate\". Identifiers must match $IDENTIFIER_REGEX"
+        }
+        return@SemanticVersionIdentifierProvider formatedDate
+    }
+
+/**
+ * Creates a [SemanticVersionIdentifierProvider] that returns the build date and time in the specified [formatter].
+ * By default, the date and time are formatted in the format `yyyyMMddHHmmss`.
+ */
+fun buildDateTimeProvider(formatter: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyyMMddHHmmss")) =
+    SemanticVersionIdentifierProvider {
+        val formatterWithZone: DateTimeFormatter =
+            if (formatter.zone == null) formatter.withZone(ZoneId.of("Z"))
+            else formatter
+
+        val formatedDate: String = formatterWithZone.format(it.buildTime.toJavaInstant())
         require(formatedDate.matches(IDENTIFIER_REGEX)) {
             "Invalid date formater. Output produced \"$formatedDate\". Identifiers must match $IDENTIFIER_REGEX"
         }

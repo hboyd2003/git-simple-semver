@@ -50,6 +50,23 @@ class SemanticVersionIdentifierProvidersTest {
     }
 
     @Test
+    fun `build date provider returns date time`() {
+        val identity = dateTimeProvider().getIdentity(buildIdentifierProviderContext())
+
+        assertNotNull(identity)
+        assertDoesNotThrow { DateTimeFormatter.ofPattern("yyyyMMddHHmmss").parse(identity) }
+    }
+
+    @Test
+    fun `build date provider returns custom date time`() {
+        val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm-ss")
+        val identity = dateTimeProvider(formatter).getIdentity(buildIdentifierProviderContext())
+
+        assertNotNull(identity)
+        assertDoesNotThrow { formatter.parse(identity) }
+    }
+
+    @Test
     fun `text provider returns text`() {
         val identity = textProvider("SNAPSHOT").getIdentity(buildIdentifierProviderContext())
 
