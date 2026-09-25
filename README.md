@@ -1,5 +1,5 @@
 # Git Simple Semver
-![Gradle Plugin Portal Version](https://img.shields.io/gradle-plugin-portal/v/dev.hboyd.git-simple-semver?strategy=latestProperty&style=flat-square&logo=Gradle&logoColor=white&label=Plugin%20Portal&link=https%3A%2F%2Fplugins.gradle.org%2Fplugin%2Fdev.hboyd.git-simple-semver)
+[![Gradle Plugin Portal Version](https://img.shields.io/gradle-plugin-portal/v/dev.hboyd.git-simple-semver?style=flat-square&logo=Gradle&logoColor=white&label=Plugin%20Portal)](https://plugins.gradle.org/plugin/dev.hboyd.git-simple-semver)
 
 Git Simple Semver is a Gradle plugin that generates the current version of the project based on git tags and
 conventional commits. It is based on the idea the version is metadata and should not be committed with the code. It's
@@ -56,7 +56,7 @@ For more information on the configuration options, see the source code.
 ## Versioning
 
 Versions follow the [SemVer 2.0.0](http://semver.org/) versioning standard. For the versions available, see the
- [tags on this repository](https://github.com/your/project/tags).
+ [tags on this repository](https://github.com/hboyd2003/git-simple-semver/tags).
 
 ## Authors
 
