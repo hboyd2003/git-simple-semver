@@ -47,7 +47,7 @@ gitSimpleSemver {
     considerMajorChangesAsMinorWhenNoRelease.set(false)
     ignoredCommitRegex.set("^SKIPME.*")
     
-    preReleaseIdentifierProviders.set(listOf(SemanticVersionIdentifierProviders.buildNumberProvider))
+    preReleaseIdentifierProviders.set(listOf(SemanticVersionIdentifierProviders.commitsSinceReleaseProvider()))
     buildIdentifierProviders.set(listOf(SemanticVersionIdentifierProvider { "build-123" }))
 }
 ```
