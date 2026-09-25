@@ -23,6 +23,8 @@ import dev.hboyd.git_simple_semver.git_semver.BumpType
 import dev.hboyd.git_simple_semver.git_semver.GitVersionGenerator
 import dev.hboyd.git_simple_semver.semver.SemanticVersion
 import org.eclipse.jgit.api.Git
+import org.eclipse.jgit.api.MergeCommand
+import org.eclipse.jgit.lib.PersonIdent
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
@@ -31,6 +33,10 @@ import org.junit.jupiter.api.io.TempDir
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.EnumSource
 import java.io.File
+import java.time.ZoneOffset
+import kotlin.time.Clock
+import kotlin.time.Duration.Companion.minutes
+import kotlin.time.toJavaInstant
 
 @TestInstance(TestInstance.Lifecycle.PER_METHOD)
 class GitVersionGeneratorTest {
@@ -411,5 +417,53 @@ class GitVersionGeneratorTest {
         val context = GitVersionGenerator.createVersionProviderContext(git.repository)
         Assertions.assertEquals(3, context.versionTags.size)
         Assertions.assertEquals(listOf("v1.1.0", "v2.1.0", "v1.0.0"), context.versionTags.map { it.toString() })
+    }
+
+    @Test
+    fun `generated version considers older commits merged later`() {
+        val instant = Clock.System.now()
+        val git: Git = setupGitRepo(testProjectDir)
+        commitRandom(git, "feat: a new feature", instant.plus(1.minutes))
+        git.tag().setName("v1.0.0").call()
+
+        git.branchCreate()
+            .setName("feature")
+            .call()
+        git.checkout()
+            .setName("feature")
+            .call()
+        commitRandom(git, "feat: a feature in the feature branch", instant.plus(2.minutes))
+        commitRandom(git, "feat: another feature in the feature branch", instant.plus(3.minutes))
+        val featureBranchRef = git.repository.fullBranch
+
+        git.checkout()
+            .setName("master")
+            .call()
+        commitRandom(git, "fix: a fix", instant.plus(4.minutes))
+
+        // Release without merging feature branch
+        git.tag().setName("v1.0.1")
+            .setTagger(PersonIdent("Test", "TestUser@non.existent", instant.plus(5.minutes).toJavaInstant(), ZoneOffset.UTC))
+            .call()
+
+        git.merge().setFastForward(MergeCommand.FastForwardMode.NO_FF)
+            .include(git.repository.exactRef(featureBranchRef))
+            .setConflictStyle(MergeCommand.ConflictStyle.MERGE)
+            .call()
+
+        val version = GitVersionGenerator(
+            listOf(),
+            listOf(ConventionalCommitMatcher("feat")),
+            listOf(ConventionalCommitMatcher("fix")),
+            considerMajorChangesAsMinorWhenNoRelease = false,
+            considerMajorChangesAsMinorWhenMajorZero = true,
+            "".toRegex(),
+            "v",
+            listOf(),
+            listOf(),
+            BumpType.PATCH
+        ).generateVersion(git.repository)
+
+        Assertions.assertEquals("1.1.0", version.toString())
     }
 }

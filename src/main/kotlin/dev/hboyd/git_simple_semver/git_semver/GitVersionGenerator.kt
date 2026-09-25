@@ -28,6 +28,7 @@ import dev.hboyd.git_simple_semver.semver.toSemanticVersionGitTag
 import org.eclipse.jgit.api.Git
 import org.eclipse.jgit.lib.*
 import org.eclipse.jgit.revwalk.RevCommit
+import org.eclipse.jgit.revwalk.RevSort
 import org.eclipse.jgit.revwalk.RevWalk
 import org.eclipse.jgit.util.FS
 import java.io.File
@@ -174,8 +175,10 @@ class GitVersionGenerator(
 
             val commits: Map<ObjectId, RevCommit>
             val versionTags: List<SemanticVersionTag>
-            if (branchRef != null && branchRef.objectId != null) {
+            if (branchRef?.objectId != null) {
                 RevWalk(repository).use { walker ->
+                    walker.sort(RevSort.TOPO_KEEP_BRANCH_TOGETHER)
+                    walker.sort(RevSort.COMMIT_TIME_DESC, true)
                     walker.markStart(walker.parseCommit(branchRef.objectId))
 
                     commits = walker.associateBy { it.id }.filterKeys { !ignoredCommitRegex.matches(it.name) }

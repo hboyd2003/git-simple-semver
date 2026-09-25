@@ -25,8 +25,12 @@ import dev.hboyd.git_simple_semver.git_semver.IdentifierProviderContext
 import dev.hboyd.git_simple_semver.semver.SemanticVersion
 import dev.hboyd.git_simple_semver.semver.SemanticVersionTag
 import org.eclipse.jgit.api.Git
+import org.eclipse.jgit.lib.PersonIdent
 import java.io.File
+import java.time.ZoneOffset
 import java.util.*
+import kotlin.time.Instant
+import kotlin.time.toJavaInstant
 
 fun setupGitRepo(dir: File, initialCommit: Boolean = true): Git {
     val git: Git = Git.init()
@@ -46,11 +50,23 @@ fun setupGitRepo(dir: File, initialCommit: Boolean = true): Git {
     return git
 }
 
-fun commitRandom(git: Git, commitMessage: String): ConventionalCommit {
+fun commitRandom(git: Git, commitMessage: String, time: Instant? = null): ConventionalCommit {
     val randomFile = git.repository.directory.resolve(UUID.randomUUID().toString())
     randomFile.writeText("Content")
     git.add().addFilepattern(randomFile.toString()).call()
-    return git.commit().setMessage(commitMessage).call().toConventionalCommit()
+
+    val commitCommand = git.commit()
+        .setMessage(commitMessage)
+
+    if (time != null) {
+        val personIdent = PersonIdent("Test", "TestUser@non.existent", time.toJavaInstant(), ZoneOffset.UTC)
+        commitCommand.author = personIdent
+        commitCommand.committer = personIdent
+    }
+
+    return commitCommand
+        .call()
+        .toConventionalCommit()
 }
 
 fun buildIdentifierProviderContext(
