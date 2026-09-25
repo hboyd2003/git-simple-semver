@@ -25,8 +25,8 @@ import dev.hboyd.git_simple_semver.git_semver.SemanticVersionIdentifierProvider
 import dev.hboyd.git_simple_semver.git_semver.TagMessageProvider
 import dev.hboyd.git_simple_semver.git_semver.VersionProviderContext
 import dev.hboyd.git_simple_semver.git_semver.branchProvider
+import dev.hboyd.git_simple_semver.git_semver.buildDateTimeProvider
 import dev.hboyd.git_simple_semver.git_semver.commitsSinceReleaseProvider
-import dev.hboyd.git_simple_semver.git_semver.dateTimeProvider
 import dev.hboyd.git_simple_semver.git_semver.textProvider
 import dev.hboyd.git_simple_semver.semver.SemanticVersion
 import org.eclipse.jgit.lib.Repository
@@ -39,6 +39,7 @@ import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.ProviderFactory
 import org.gradle.api.tasks.Nested
+import java.time.format.DateTimeFormatter
 import javax.inject.Inject
 import kotlin.time.Instant
 
@@ -166,7 +167,8 @@ abstract class GitSimpleSemverExtension @Inject constructor(
         objects.listProperty(SemanticVersionIdentifierProvider::class.java)
             .convention(listOf(
                 commitsSinceReleaseProvider().onlyIfChanges(),
-                dateTimeProvider().onlyIfDirty()))
+                buildDateTimeProvider(DateTimeFormatter.ofPattern("yyyy-MM-dd")).onlyIfDirty(),
+                buildDateTimeProvider(DateTimeFormatter.ofPattern("HH-mm-ss")).onlyIfDirty()))
 
     /**
      * The generator used to calculate the version.
