@@ -26,9 +26,9 @@ import kotlin.time.toJavaInstant
 
 /**
  * Creates a [SemanticVersionIdentifierProvider] that returns the current date and time in the specified [formatter].
- * By default, the date and time are formatted in the format `yyyyMMddHHmmss`.
+ * By default, the date and time are formatted in the format `yyyy-MM-dd-HH-mm-ss`.
  */
-fun dateTimeProvider(formatter: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyyMMddHHmmss")) =
+fun dateTimeProvider(formatter: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm-ss")) =
     SemanticVersionIdentifierProvider {
         val formatterWithZone: DateTimeFormatter =
             if (formatter.zone == null) formatter.withZone(Clock.systemUTC().zone)
@@ -43,9 +43,9 @@ fun dateTimeProvider(formatter: DateTimeFormatter = DateTimeFormatter.ofPattern(
 
 /**
  * Creates a [SemanticVersionIdentifierProvider] that returns the build date and time in the specified [formatter].
- * By default, the date and time are formatted in the format `yyyyMMddHHmmss`.
+ * By default, the date and time are formatted in the format `yyyy-MM-dd-HH-mm-ss`.
  */
-fun buildDateTimeProvider(formatter: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyyMMddHHmmss")) =
+fun buildDateTimeProvider(formatter: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm-ss")) =
     SemanticVersionIdentifierProvider {
         val formatterWithZone: DateTimeFormatter =
             if (formatter.zone == null) formatter.withZone(ZoneId.of("Z"))

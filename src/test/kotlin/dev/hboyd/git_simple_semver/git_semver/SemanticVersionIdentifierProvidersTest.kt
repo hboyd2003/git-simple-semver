@@ -37,12 +37,12 @@ class SemanticVersionIdentifierProvidersTest {
         val identity = dateTimeProvider().getIdentity(buildIdentifierProviderContext())
 
         assertNotNull(identity)
-        assertDoesNotThrow { DateTimeFormatter.ofPattern("yyyyMMddHHmmss").parse(identity) }
+        assertDoesNotThrow { DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm-ss").parse(identity) }
     }
 
     @Test
     fun `date provider returns custom date time`() {
-        val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm-ss")
+        val formatter = DateTimeFormatter.ofPattern("yyyyMMddHHmmss")
         val identity = dateTimeProvider(formatter).getIdentity(buildIdentifierProviderContext())
 
         assertNotNull(identity)
@@ -54,12 +54,12 @@ class SemanticVersionIdentifierProvidersTest {
         val identity = dateTimeProvider().getIdentity(buildIdentifierProviderContext())
 
         assertNotNull(identity)
-        assertDoesNotThrow { DateTimeFormatter.ofPattern("yyyyMMddHHmmss").parse(identity) }
+        assertDoesNotThrow { DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm-ss").parse(identity) }
     }
 
     @Test
     fun `build date provider returns custom date time`() {
-        val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm-ss")
+        val formatter = DateTimeFormatter.ofPattern("yyyyMMddHHmmss")
         val identity = dateTimeProvider(formatter).getIdentity(buildIdentifierProviderContext())
 
         assertNotNull(identity)
