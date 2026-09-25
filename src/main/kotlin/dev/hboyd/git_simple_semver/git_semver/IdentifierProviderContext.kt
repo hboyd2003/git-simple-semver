@@ -27,7 +27,7 @@ import dev.hboyd.git_simple_semver.semver.SemanticVersionTag
  */
 class IdentifierProviderContext(
     val version: SemanticVersion,
-    val bumpType: BumpType,
+    bumpType: BumpType,
     dirty: Boolean,
     branch: String,
     commits: List<ConventionalCommit>,
@@ -40,7 +40,8 @@ class IdentifierProviderContext(
     commits,
     versionTags,
     commitsSinceLastVersionTag,
-    commitsSinceLastReleaseVersionTag
+    commitsSinceLastReleaseVersionTag,
+    bumpType
 ) {
     constructor(
         versionProviderContext: VersionProviderContext,
