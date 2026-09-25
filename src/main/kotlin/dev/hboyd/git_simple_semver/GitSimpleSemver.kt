@@ -23,14 +23,12 @@ import dev.hboyd.git_simple_semver.task.SimplePrintTask
 import dev.hboyd.git_simple_semver.task.TagTask
 import org.gradle.api.Plugin
 import org.gradle.api.Project
-import org.gradle.api.plugins.JavaPlugin
 import org.gradle.api.publish.PublishingExtension
 import org.gradle.api.publish.maven.MavenPublication
 
 abstract class GitSimpleSemver : Plugin<Project> {
 
     override fun apply(project: Project): Unit = with(project) {
-        pluginManager.apply(JavaPlugin::class.java)
         val extension: GitSimpleSemverExtension =
             extensions.create("gitSimpleSemver", GitSimpleSemverExtension::class.java)
 
