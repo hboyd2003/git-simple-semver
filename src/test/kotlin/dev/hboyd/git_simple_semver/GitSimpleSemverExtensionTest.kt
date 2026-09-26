@@ -131,6 +131,7 @@ class GitSimpleSemverExtensionTest {
         val git = generateGradleProject(
             """
             |    considerMajorChangesAsMinorWhenNoRelease.set(false)
+            |    considerMajorChangesAsMinorWhenMajorVersionZero.set(false)
             """.trimMargin()
         )
         commitRandom(git, "feat!: replace api")
